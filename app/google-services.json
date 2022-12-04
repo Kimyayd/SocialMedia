@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "670104421605",
+    "project_id": "youpost-e5fba",
+    "storage_bucket": "youpost-e5fba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670104421605:android:12cff44e0502a63e33400c",
+        "android_client_info": {
+          "package_name": "com.kimyayd.youpost"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670104421605-rj8qo5tofmqa27nmjcajqnu8qhhb8kda.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kimyayd.youpost",
+            "certificate_hash": "05aa8bb6f16f7143f1dc26d03892fff1ba940257"
+          }
+        },
+        {
+          "client_id": "670104421605-99ig0j0tmq085emu30pht3qs8c1nocss.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjYBQ3m4TzezL2bolLPuky8t8lkd2D5MY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670104421605-99ig0j0tmq085emu30pht3qs8c1nocss.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-anydpi/ic_add.xml" value="0.2075" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-anydpi/ic_checkmark.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-anydpi/ic_display_name.xml" value="0.201" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-anydpi/ic_email.xml" value="0.183" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-anydpi/ic_phone.xml" value="0.183" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-anydpi/ic_user.xml" value="0.1795" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-anydpi/ic_web.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-mdpi/follow_button.xml" value="0.1215" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-v24/background_left.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-v24/background_right.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/dialog_bg.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/gray_border_bottom.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/ic_back.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/my_rect.xml" value="0.102" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/photo_post.xml" value="0.183" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/text_post.xml" value="0.183" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/vector_heart_red.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable-xhdpi/video_post.xml" value="0.183" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/add.xml" value="0.2075" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/adds.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/chat.xml" value="0.168" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/circle.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/copy.xml" value="0.249" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/delete.xml" value="0.249" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/favorite.xml" value="0.2075" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/gradient.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/grey_border_bottom.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_back.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_baseline_chat_bubble_outline_24.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_baseline_favorite_24.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_baseline_favorite_border_24.xml" value="0.1605" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_baseline_label_24.xml" value="0.201" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.1365" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.191" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_baseline_share_24.xml" value="0.1605" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_heart_red.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_instagram.xml" value="0.1115" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_send.xml" value="0.1425" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/ic_share.xml" value="0.168" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/round_back_light_10.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/drawable/white_grey_border_bottom.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/activity_add.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/activity_message.xml" value="0.16" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/activity_next.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/chat_item_left.xml" value="0.2" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/chat_item_right.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/fragment_camera.xml" value="0.12132725430597771" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/fragment_chats.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/fragment_gallery.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/fragment_photo.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/layout_grid_imageview.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/layout_mainfeed_listitem.xml" value="0.12280701754385964" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/snippet_top_gallerytoolbar.xml" value="0.12132725430597771" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/snippet_top_nexttoolbar.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/snippet_top_view_profilebar.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout-v24/user_item.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_accountsettings.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_add_text.xml" value="0.2" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_add_video.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_chat.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_comment.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_main.xml" value="0.16" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_profile.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_register.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_reset_password.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_splash.xml" value="0.12132725430597771" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_vi.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_video.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/activity_view_profil.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/dialog_confirm_password.xml" value="0.2484375" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_add.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_chats.xml" value="0.10555555555555556" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_editprofile.xml" value="0.2484375" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_home.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_notification.xml" value="0.2" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_photopost.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_profile.xml" value="0.24947916666666667" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_search.xml" value="0.23865877712031558" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_signout.xml" value="0.24947916666666667" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_text.xml" value="0.12962962962962962" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_users.xml" value="0.11041666666666666" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_video.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_view_comments.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_view_profile.xml" value="0.2" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_view_text.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/fragment_view_video.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/item_container_video.xml" value="0.1953125" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layoiut_center_view_profile.xml" value="0.24895833333333334" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout.xml" value="0.24895833333333334" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_bottom_tabs.xml" value="0.2484375" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_center_accountsettings.xml" value="0.2913625304136253" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_center_profile.xml" value="0.2484375" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_center_view_profile.xml" value="0.16799999999999998" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_center_viewpager.xml" value="0.24947916666666667" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_comment.xml" value="0.24895833333333334" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_login.xml" value="0.168" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_main_listitem.xml" value="0.19384057971014493" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_mainfeed_listitem.xml" value="0.2" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_top_tabs.xml" value="0.24895833333333334" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_user_listitem.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_viceo.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_video.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_video_post.xml" value="0.16" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/layout_view_text.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/message_layout.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/pop2_thing.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/pop_thing.xml" value="0.2" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_center_editprofile.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_comments_toolbar.xml" value="0.25" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_searchbar.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_top_accountsettingtoolbar.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_top_editprofiletoolbar.xml" value="0.2484375" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_top_profil.xml" value="0.2484375" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_top_profilbar.xml" value="0.264" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_top_view_profile.xml" value="0.2" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/layout/snippet_top_view_profilebar.xml" value="0.17255434782608695" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/menu/bottom_nav_menu.xml" value="0.5253623188405797" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
+        <entry key="..\:/Users/Dorcas/AndroidStudioProjects/YouPost/app/src/main/res/xml/paths.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
