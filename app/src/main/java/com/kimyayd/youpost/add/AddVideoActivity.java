@@ -41,10 +41,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.kimyayd.youpost.MainActivity;
 import com.kimyayd.youpost.R;
-import com.kimyayd.youpost.models.Post;
-import com.kimyayd.youpost.models.RealVideo;
-import com.kimyayd.youpost.models.Video;
 import com.kimyayd.youpost.utils.FilePaths;
 import com.kimyayd.youpost.utils.FirebaseMethods;
 
@@ -55,7 +53,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class AddVideoActivity extends AppCompatActivity {
-    private static final String TAG = "Videos";
+    private static final String TAG = "AddVideoActivity";
     //firebase
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -65,22 +63,15 @@ public class AddVideoActivity extends AppCompatActivity {
     private StorageReference mStorageReference;
     private double mPhotoUploadProgress=0;
 
-    //widgets
-    private EditText mCaption;
     private int mFollowersCount = 3;
 
-    //vars
     private String mAppend = "file:/";
     private int videoCount = 1;
-    private String videoUrl;
-    private Bitmap bitmap;
-    private Intent intent;
     private EditText titleEt;
     private VideoView videoView;
     private ImageButton uploadVideoBtn,video_back;
     private FloatingActionButton pickVideoFab;
     private ProgressDialog progressDialog;
-    private String title;
     public static final int VIDEO_PICK_GALLERY_CODE = 100;
     public static final int VIDEO_PICK_CAMERA_CODE = 101;
     public static final int CAMERA_REQUEST_CODE = 102;
@@ -177,27 +168,7 @@ public class AddVideoActivity extends AppCompatActivity {
 
         return result1 && result2;
     }
-    //
-//    private void someMethod(){
-//        /*
-//            Step 1)
-//            Create a data model for Photos
-//            Step 2)
-//            Add properties to the Photo Objects (caption, date, imageUrl, photo_id, tags, user_id)
-//            Step 3)
-//            Count the number of photos that the user already has.
-//            Step 4)
-//            a) Upload the photo to Firebase Storage
-//            b) insert into 'photos' node
-//            c) insert into 'user_photos' node
-//         */
-//
-//    }
-//
-//
-//    /**
-//     * gets the image url from the incoming intent and displays the chosen image
-//     */
+
     private void videoPickGallery(){
         Intent intent=new Intent();
         intent.setType("video/*");
@@ -292,10 +263,8 @@ public class AddVideoActivity extends AppCompatActivity {
                         result.addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                Toast.makeText(mContext, "video upload success", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "Video upload success", Toast.LENGTH_SHORT).show();
                                 addVideoToDatabase(caption,uri.toString());
-                                Toast.makeText(mContext, "Here", Toast.LENGTH_SHORT).show();
-
                             }
                         });
                     }
@@ -323,17 +292,8 @@ public class AddVideoActivity extends AppCompatActivity {
     }
     private void addVideoToDatabase(String caption, String url){
         Log.d(TAG, "addVideoToDatabase: adding video to database.");
-        Toast.makeText(mContext, "Here", Toast.LENGTH_SHORT).show();
 
-        String newPostKey = myRef.child(mContext.getString(R.string.dbname_videos)).push().getKey();
-//        Video video = new Video();
-//        video.setCaption(caption);
-//        video.setDate_created(getTimestamp());
-//        video.setVideo_path(url);
-//        video.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
-//     video.setVideo_id(newPostKey);
-//        RealVideo realVideo=new RealVideo();
-//        realVideo.setVideo(video);
+        String newPostKey = myRef.child(mContext.getString(R.string.dbname_user_videos)).push().getKey();
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("caption", caption);
         hashMap.put("date_created", getTimestamp());
@@ -347,7 +307,7 @@ public class AddVideoActivity extends AppCompatActivity {
         myRef.child(mContext.getString(R.string.dbname_user_videos))
                 .child(FirebaseAuth.getInstance().getCurrentUser()
                         .getUid()).child("video").child(newPostKey).setValue(hashMap);
-
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
     }
     private String getTimestamp(){
@@ -368,27 +328,23 @@ public class AddVideoActivity extends AppCompatActivity {
 
 
             if (user != null) {
-                // User is signed in
+
                 Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
             } else {
-                // User is signed out
+
                 Log.d(TAG, "onAuthStateChanged:signed_out");
             }
-            // ...
-        };
 
-        Toast.makeText(mContext, "Everything is okay!!", Toast.LENGTH_SHORT).show();
+        };
 
         myRef.addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                //retrieve user information from the database
                 videoCount = mFirebaseMethods.getVideoCount(dataSnapshot);
                 Log.d(TAG, "onDataChange: image count: " + videoCount);
 
-                //retrieve images for the user in question
 
             }
 

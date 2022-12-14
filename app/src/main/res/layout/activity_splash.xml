@@ -24,7 +24,7 @@
         android:layout_centerHorizontal="true"
         android:padding="12dp"
         android:text="You Post"
-        android:textColor="#F0F0FF"
+        android:textColor="@color/black"
         android:textSize="30sp"
         android:textStyle="bold" />
 

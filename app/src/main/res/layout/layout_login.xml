@@ -85,7 +85,7 @@
                 android:textAlignment="textEnd"
                 android:textSize="16sp"
                 android:textStyle="italic"
-                android:text="Mot de passe oublie ?"
+                android:text="Forgot password?"
                 />
 
             <Button

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -37,8 +38,7 @@ public class VideoActivity extends AppCompatActivity {
     private List<Video> videos;
     private static final String TAG = "VideoActivity";
     private int resultsCount = 0;
-    private RelativeLayout relativeLayout;
-    RecyclerView recyclerView;
+    ViewPager2 recyclerView;
     VideoPostAdapter postsAdapter;
 
     @Override
@@ -46,12 +46,10 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
         recyclerView =findViewById(R.id.videosViewPager);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
-        layoutManager.setReverseLayout(true);
-        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHorizontalFadingEdgeEnabled(true);
 
         getFollowing();
+        loadVideos();
     }
     private void getFollowing() {
         Log.d(TAG, "getFollowing: searching for following");
@@ -60,10 +58,8 @@ public class VideoActivity extends AppCompatActivity {
         //also add your own id to the list
         mFollowing.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        Query query = FirebaseDatabase.getInstance().getReference()
-                .child(getString(R.string.dbname_following))
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                ;
+        Query query = FirebaseDatabase.getInstance().getReference(getString(R.string.dbname_users));
+
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

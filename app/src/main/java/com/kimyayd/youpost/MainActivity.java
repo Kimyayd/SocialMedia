@@ -2,7 +2,6 @@ package com.kimyayd.youpost;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -18,19 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.kimyayd.youpost.models.Post;
-import com.kimyayd.youpost.models.Text;
-import com.kimyayd.youpost.models.Video;
-import com.kimyayd.youpost.utils.MainFeedListAdapter;
-import com.kimyayd.youpost.utils.UniversalImageLoader;
-import com.kimyayd.youpost.utils.ViewCommentsFragment;
-import com.kimyayd.youpost.utils.ViewPostCommentsFragment;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity  implements
-        MainFeedListAdapter.OnLoadMoreItemsListener{
+public class MainActivity extends AppCompatActivity{
     private static final String TAG = "MainActivity";
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
@@ -50,7 +40,6 @@ public class MainActivity extends AppCompatActivity  implements
                 R.id.navigation_home, R.id.navigation_search, R.id.navigation_add, R.id.navigation_messages, R.id.navigation_profile)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-//         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
     }
@@ -61,79 +50,6 @@ public class MainActivity extends AppCompatActivity  implements
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
-    }
-//    public void hideLayout(){
-//        Log.d(TAG, "hideLayout: hiding layout");
-//        mRelativeLayout.setVisibility(View.GONE);
-//        mFrameLayout.setVisibility(View.VISIBLE);
-//    }
-//
-//
-//    public void showLayout(){
-//        Log.d(TAG, "hideLayout: showing layout");
-//        mRelativeLayout.setVisibility(View.VISIBLE);
-//        mFrameLayout.setVisibility(View.GONE);
-//    }
-
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        if(mFrameLayout.getVisibility() == View.VISIBLE){
-//            showLayout();
-//        }
-//    }
-
-    public void onCommentThreadSelected(Post post, String callingActivity){
-        Log.d(TAG, "onCommentThreadSelected: selected a comment thread");
-
-        ViewPostCommentsFragment fragment  = new ViewPostCommentsFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(getString(R.string.post), post);
-        args.putString(getString(R.string.home_activity), getString(R.string.home_activity));
-        fragment.setArguments(args);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.addToBackStack(getString(R.string.view_comments_fragment));
-        transaction.commit();
-
-    }
-    public void onCommentThreadSelectedVideo(Video video, String callingActivity){
-        Log.d(TAG, "onCommentThreadSelectedVideo: selected a comment thread");
-
-        ViewCommentsFragment fragment  = new ViewCommentsFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(getString(R.string.video), video);
-        args.putString(getString(R.string.home_activity), getString(R.string.home_activity));
-        fragment.setArguments(args);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.addToBackStack(getString(R.string.view_comments_fragment));
-        transaction.commit();
-
-    }
-    public void onCommentThreadSelectedText(Text text, String callingActivity){
-        Log.d(TAG, "onCommentThreadSelectedText: selected a comment thread");
-
-        ViewCommentsFragment fragment  = new ViewCommentsFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(getString(R.string.text), text);
-        args.putString(getString(R.string.home_activity), getString(R.string.home_activity));
-        fragment.setArguments(args);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.addToBackStack(getString(R.string.view_comments_fragment));
-        transaction.commit();
-
-    }
-
-    @Override
-    public void onLoadMoreItems() {
-//        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentById();
-//        fragment.displayMorePosts();
-    }
-    private void initImageLoader(){
-        UniversalImageLoader universalImageLoader = new UniversalImageLoader(MainActivity.this);
-        ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
 
     private void setupFirebaseAuth(){

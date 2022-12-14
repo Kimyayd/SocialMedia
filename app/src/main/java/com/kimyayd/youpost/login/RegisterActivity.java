@@ -67,12 +67,13 @@ public class RegisterActivity extends AppCompatActivity {
             cpassword =mCPassword.getText().toString();
 
             if(checkInputs(email, username, password)){
-                mProgressBar.setVisibility(View.VISIBLE);
-                loadingPleaseWait.setVisibility(View.VISIBLE);
+
               if(password.equals(cpassword)) {
+                  mProgressBar.setVisibility(View.VISIBLE);
+                  loadingPleaseWait.setVisibility(View.VISIBLE);
                   firebaseMethods.registerNewEmail(email, password, username);
               }else{
-                  Toast.makeText(mContext, "The password are not conresponding", Toast.LENGTH_SHORT).show();
+                  Toast.makeText(mContext, "The password are not corresponding", Toast.LENGTH_SHORT).show();
               }
             }
         });
@@ -91,30 +92,18 @@ public class RegisterActivity extends AppCompatActivity {
      */
     private void initWidgets(){
         Log.d(TAG, "initWidgets: Initializing Widgets.");
-        mEmail = (EditText) findViewById(R.id.input_email);
-        mUsername = (EditText) findViewById(R.id.input_username);
-        btnRegister = (Button) findViewById(R.id.btn_register);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        loadingPleaseWait = (TextView) findViewById(R.id.loadingPleaseWait);
-        mPassword = (EditText) findViewById(R.id.input_password);
-        mCPassword = (EditText) findViewById(R.id.input_confirm_password);
+        mEmail = findViewById(R.id.input_email);
+        mUsername =  findViewById(R.id.input_username);
+        btnRegister =  findViewById(R.id.btn_register);
+        mProgressBar =  findViewById(R.id.progressBar);
+        loadingPleaseWait =  findViewById(R.id.loadingPleaseWait);
+        mPassword =  findViewById(R.id.input_password);
+        mCPassword =  findViewById(R.id.input_confirm_password);
         mContext = RegisterActivity.this;
         mProgressBar.setVisibility(View.GONE);
         loadingPleaseWait.setVisibility(View.GONE);
 
     }
-
-    private boolean isStringNull(String string){
-        Log.d(TAG, "isStringNull: checking string if null.");
-
-        if(string.equals("")){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
 
 
     private void setupFirebaseAuth(){

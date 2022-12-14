@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
@@ -14,11 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,13 +27,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.kimyayd.youpost.MainActivity;
 import com.kimyayd.youpost.R;
 import com.kimyayd.youpost.models.User;
-import com.kimyayd.youpost.profile.ProfileActivity;
 import com.kimyayd.youpost.profile.ViewProfilActivity;
 import com.kimyayd.youpost.utils.UserListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+
 public class SearchFragment extends Fragment {
 
     private Context mContext = getContext();
@@ -56,12 +51,12 @@ public class SearchFragment extends Fragment {
 
     @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         Log.d(TAG, "onCreateView: started.");
 
-        mSearchParam = (EditText) view.findViewById(R.id.search);
-        mListView = (ListView) view.findViewById(R.id.searchView);
+        mSearchParam =  view.findViewById(R.id.search);
+        mListView =  view.findViewById(R.id.searchView);
         setupFirebaseAuth();
 
         readUsers();
@@ -126,37 +121,7 @@ public class SearchFragment extends Fragment {
             });
 
     }
-//    private void searchForMatchs(String keyword){
-//        Log.d(TAG, "searchForMatch: searching for a match: " + keyword);
-//        mUserList.clear();
-//
-//        //update the users list view
-//        if(keyword.length() ==0){
-//
-//        }else{
-//            DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference();
-//            Query query = databaseReference.child(getString(R.string.dbname_users));
-//            query.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()) {
-//                        if (singleSnapshot.getValue(User.class).getUsername().toLowerCase().contains(keyword.toLowerCase())) {
-//                            Log.d(TAG, "onDataChange: found user:" + singleSnapshot.getValue(User.class).toString());
-//
-//                            mUserList.add(singleSnapshot.getValue(User.class));
-//                            //update the users list view
-//                            updateUsersList();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//        }
-//    }
+
     private void updateUsersList(){
         Log.d(TAG, "updateUsersList: updating users list");
 

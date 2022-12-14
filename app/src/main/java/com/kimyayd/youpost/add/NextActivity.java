@@ -55,13 +55,13 @@ public class NextActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_next);
         mFirebaseMethods = new FirebaseMethods(NextActivity.this);
-        mCaption = (EditText) findViewById(R.id.caption) ;
+        mCaption = findViewById(R.id.caption) ;
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(NextActivity.this));
 
 
         setupFirebaseAuth();
 
-        ImageView backArrow = (ImageView) findViewById(R.id.ivBackArrow);
+        ImageView backArrow = findViewById(R.id.ivBackArrow);
         backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,12 +71,12 @@ public class NextActivity extends AppCompatActivity {
         });
 
 
-        TextView share = (TextView) findViewById(R.id.tvShare);
+        TextView share = findViewById(R.id.tvShare);
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: navigating to the final share screen.");
-                //upload the image to firebase
+
                 Toast.makeText(NextActivity.this, "Attempting to upload new photo", Toast.LENGTH_SHORT).show();
 
                 String caption = mCaption.getText().toString();
@@ -88,7 +88,7 @@ public class NextActivity extends AppCompatActivity {
 
                 }
                 else if(intent.hasExtra(getString(R.string.selected_bitmap))){
-                    bitmap = (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap));
+                    bitmap =intent.getParcelableExtra(getString(R.string.selected_bitmap));
                     mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, null,bitmap);
                                     }
 
@@ -99,30 +99,10 @@ public class NextActivity extends AppCompatActivity {
 
         setImage();
     }
-//
-//    private void someMethod(){
-//        /*
-//            Step 1)
-//            Create a data model for Photos
-//            Step 2)
-//            Add properties to the Photo Objects (caption, date, imageUrl, photo_id, tags, user_id)
-//            Step 3)
-//            Count the number of photos that the user already has.
-//            Step 4)
-//            a) Upload the photo to Firebase Storage
-//            b) insert into 'photos' node
-//            c) insert into 'user_photos' node
-//         */
-//
-//    }
-//
-//
-//    /**
-//     * gets the image url from the incoming intent and displays the chosen image
-//     */
+
     private void setImage(){
         intent = getIntent();
-        ImageView image = (ImageView) findViewById(R.id.imageShare);
+        ImageView image = findViewById(R.id.imageShare);
 
         if(intent.hasExtra(getString(R.string.selected_image))){
             imgUrl = intent.getStringExtra(getString(R.string.selected_image));
@@ -130,7 +110,7 @@ public class NextActivity extends AppCompatActivity {
             UniversalImageLoader.setImage(imgUrl, image, null, mAppend);
         }
         else if(intent.hasExtra(getString(R.string.selected_bitmap))){
-            bitmap = (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap));
+            bitmap = intent.getParcelableExtra(getString(R.string.selected_bitmap));
             Log.d(TAG, "setImage: got new bitmap");
             image.setImageBitmap(bitmap);
         }
@@ -157,27 +137,23 @@ public class NextActivity extends AppCompatActivity {
 
 
             if (user != null) {
-                // User is signed in
+
                 Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
             } else {
-                // User is signed out
+
                 Log.d(TAG, "onAuthStateChanged:signed_out");
             }
-            // ...
-        };
 
-        Toast.makeText(NextActivity.this, "Everything is okay!!", Toast.LENGTH_SHORT).show();
+        };
 
         myRef.addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                //retrieve user information from the database
                 imageCount = mFirebaseMethods.getImageCount(dataSnapshot);
                 Log.d(TAG, "onDataChange: image count: " + imageCount);
 
-                //retrieve images for the user in question
 
             }
 

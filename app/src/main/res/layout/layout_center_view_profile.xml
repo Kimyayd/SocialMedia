@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/relLayout1"
-            android:background="@color/white">
+        >
 
             <LinearLayout
                 android:id="@+id/linLayout"
@@ -30,16 +30,17 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="25dp"
+                    android:layout_marginTop="20dp"
                     android:layout_weight="25">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/profile_photo"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
                         android:layout_centerVertical="true"
                         android:src="@drawable/ic_user"
                         app:civ_border_color="@color/black"
-                        app:civ_border_width="0.5dp"/>
+                        app:civ_border_width="0.5dp" />
 
 
                 </RelativeLayout>
@@ -47,11 +48,11 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="30dp"
                     android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
                     android:layout_weight="75">
 
-                    <include layout="@layout/snippet_top_view_profile"/>
+                    <include layout="@layout/snippet_top_view_profile" />
 
                 </RelativeLayout>
 
@@ -72,7 +73,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"/>
 
                 <TextView
@@ -81,7 +82,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:textColor="@color/black"
-                    android:textSize="16sp"/>
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/website"
@@ -89,7 +90,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:textColor="@color/link_blue"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     />
 
 

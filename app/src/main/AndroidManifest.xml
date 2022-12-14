@@ -12,7 +12,8 @@
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
@@ -31,7 +32,7 @@
             android:name=".utils.Comment_activity"
             android:exported="false" />
         <activity
-            android:name=".messenger.ChatActivity"
+            android:name=".utils.Comment__activity"
             android:exported="false" />
         <activity
             android:name=".message.MessageActivity"
@@ -48,9 +49,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
-        <activity
-            android:name=".add.Videos"
-            android:exported="false" />
         <activity
             android:name=".login.LoginActivity"
             android:exported="true" />
@@ -70,9 +68,6 @@
             android:name=".profile.AccountSettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".profile.ProfileActivity"
-            android:exported="false" />
-        <activity
             android:name=".video.VideoActivity"
             android:exported="false" />
         <activity
@@ -85,6 +80,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.kimyayd.youpost.fileprovider"
+
+            android:exported="false"
+            android:grantUriPermissions="true"
+            >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths"
+                />
+        </provider>
     </application>
 
 </manifest>

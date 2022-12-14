@@ -10,9 +10,6 @@ public class Chat {
     private String hour;
     private boolean delete;
 
-
-
-
     public Chat(String id, String sender, String receiver, String message, boolean isseen, String date, String hour, boolean delete) {
         this.id = id;
         this.sender = sender;

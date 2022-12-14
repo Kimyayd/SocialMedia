@@ -2,6 +2,8 @@ package com.kimyayd.youpost.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -10,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -26,19 +28,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.kimyayd.youpost.MainActivity;
 import com.kimyayd.youpost.R;
-import com.kimyayd.youpost.models.Comment;
 import com.kimyayd.youpost.models.Heart;
 import com.kimyayd.youpost.models.Like;
 import com.kimyayd.youpost.models.Post;
 import com.kimyayd.youpost.models.User;
 import com.kimyayd.youpost.models.UserAccountSettings;
-import com.kimyayd.youpost.profile.ProfileActivity;
+import com.kimyayd.youpost.profile.ViewProfilActivity;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.sprylab.android.widget.TextureVideoView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -57,7 +59,7 @@ public class MainListAdapter extends ArrayAdapter<Post> {
     }
     OnLoadMoreItemsListener mOnLoadMoreItemsListener;
 
-    private static final String TAG = "MainFeedListAdapter";
+    private static final String TAG = "MainListAdapter";
 
     private LayoutInflater mInflater;
     private int mLayoutResource;
@@ -73,13 +75,41 @@ public class MainListAdapter extends ArrayAdapter<Post> {
         mReference = FirebaseDatabase.getInstance().getReference();
 
     }
+    private void shareImageAndText(String title,Bitmap bit) {
+        Uri uri = saveImage(bit);
+        //share intent
+        Intent shIntent = new Intent(Intent.ACTION_SEND);
+        shIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shIntent.putExtra(Intent.EXTRA_TEXT, title);
+        shIntent.putExtra(Intent.EXTRA_SUBJECT, "Share Here");
+        shIntent.setType("image/*");
+        mContext.startActivity(Intent.createChooser(shIntent, "Share Via"));
+    }
+
+    private Uri saveImage(Bitmap image) {
+        File imagesFolder = new File(mContext.getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imagesFolder.mkdirs();
+            File file = new File(imagesFolder, "shared_image.png");
+
+            FileOutputStream stream = new FileOutputStream(file);
+            image.compress(Bitmap.CompressFormat.PNG, 90, stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(mContext, "com.kimyayd.youpost.fileprovider", file);
+
+        } catch (IOException e) {
+            Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return uri;
+    }
 
     static class ViewHolder{
         CircleImageView mprofileImage;
         String likesString;
         TextView username, timeDetla, caption, likes, comments;
         SquareImageView image;
-        TextView text;
         ImageView heartRed, heartWhite, comment,share;
 
 
@@ -103,7 +133,6 @@ public class MainListAdapter extends ArrayAdapter<Post> {
             holder = new ViewHolder();
             ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
             holder.username = (TextView) convertView.findViewById(R.id.username);
-            holder.text = (TextView) convertView.findViewById(R.id.post_text);
             holder.image = (SquareImageView) convertView.findViewById(R.id.post_image);
             holder.heartRed = (ImageView) convertView.findViewById(R.id.image_heart_red);
             holder.heartWhite = (ImageView) convertView.findViewById(R.id.image_heart);
@@ -130,18 +159,45 @@ public class MainListAdapter extends ArrayAdapter<Post> {
 
         getCurrentUsername();
         getLikesString(holder);
-//        List<Comment> comments = getItem(position).getComments();
-        //" + comments.size() + "
-        holder.comments.setText("View all comments");
+
+        final int[] l = {0};
+
+            DatabaseReference refs = FirebaseDatabase.getInstance().getReference("user_posts").child(holder.post.getUser_id()).child("comments").child(holder.post.getPost_id());
+            refs.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
+                        Log.d(TAG, "It'sss not" + dataSnapshot1);
+                        if (dataSnapshot1.exists()) {
+                            l[0]++;
+                        }
+                    }if(l[0]==0) {
+                        holder.comments.setText("Add a comment");
+                    }else if(l[0]==1){
+                        holder.comments.setText("View comment");
+                    }else{
+                        holder.comments.setText("View all " + l[0] + " comments");
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         holder.comments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onClick: loading comment thread for " + getItem(position).getPost_id());
-                ((MainActivity)mContext).onCommentThreadSelected(getItem(position),
-                        mContext.getString(R.string.home_activity));
+                Intent intent=new Intent(mContext, Comment_activity.class);
+                intent.putExtra("id",holder.post.getPost_id());
+                intent.putExtra("user_id",holder.post.getUser_id());
+                intent.putExtra("type",holder.post.getPost_type());
+                intent.putExtra(mContext.getString(R.string.calling_activity),
+                        mContext.getString(R.string.home_fragment));
+                mContext.startActivity(intent);
             }
         });
-
 
         String timestampDifference = getTimestampDifference(getItem(position));
         if(!timestampDifference.equals("0")){
@@ -150,59 +206,20 @@ public class MainListAdapter extends ArrayAdapter<Post> {
             holder.timeDetla.setText("TODAY");
         }
         Log.d(TAG, "getView: "+getItem(position).getPost_type());
+        holder.caption.setText(getItem(position).getCaption());
+        if(holder.post.getPost_type().equals("0")){
+            holder.image.setVisibility(View.GONE);
+            Log.d(TAG,"Text is on: 0");
 
-        if(holder.post.getPost_type().equals("1")) {
+
+        }
+        else if(holder.post.getPost_type().equals("1")) {
             Log.d(TAG,"Image is on: 1");
-            holder.text.setVisibility(View.GONE);
-            holder.caption.setText(getItem(position).getCaption());
             final ImageLoader imageLoader = ImageLoader.getInstance();
             imageLoader.displayImage(getItem(position).getPost_path(), holder.image);
         }
-        else if(holder.post.getPost_type().equals("0")){
-            Log.d(TAG,"Text is on: 0");
-            holder.text.setText(getItem(position).getCaption());
 
-        }
-        holder.share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (holder.post.getPost_type().equals("1")) {
-                    Uri imageUri = Uri.parse(holder.post.getPost_path());
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, holder.post.getCaption());
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-                    shareIntent.setType("image/*");
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                    try {
-                        mContext.startActivity(shareIntent);
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }else {
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, holder.post.getCaption());
-                    shareIntent.setType("text/plain");
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                    try {
-                        mContext.startActivity(shareIntent);
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            }
-        });
-        //set the image
-//        if(!getItem(position).getPost_type().equals(R.string.text)) {
-//            final ImageLoader imageLoader = ImageLoader.getInstance();
-//            imageLoader.displayImage(getItem(position).getPost_path(), holder.image);
-//        }
-
-        //get the profile image and username
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         Query query = reference
                 .child(mContext.getString(R.string.dbname_user_account_settings))
@@ -229,7 +246,7 @@ public class MainListAdapter extends ArrayAdapter<Post> {
                         public void onClick(View v) {
                             Log.d(TAG, "onClick: navigating to profile of: " +
                                     holder.user.getUsername());
-                            Intent intent = new Intent(mContext, ProfileActivity.class);
+                            Intent intent = new Intent(mContext, ViewProfilActivity.class);
                             intent.putExtra(mContext.getString(R.string.calling_activity),
                                     mContext.getString(R.string.home_activity));
                             intent.putExtra(mContext.getString(R.string.intent_user), holder.user);
@@ -242,13 +259,14 @@ public class MainListAdapter extends ArrayAdapter<Post> {
                                                                 public void onClick(View v) {
                                                                     Log.d(TAG, "onClick: navigating to profile of: " +
                                                                             holder.user.getUsername());
+                                                                    Intent intent = new Intent(mContext, ViewProfilActivity.class);
+                                                                    intent.putExtra(mContext.getString(R.string.calling_activity),
+                                                                            mContext.getString(R.string.home_activity));
+                                                                    intent.putExtra(mContext.getString(R.string.intent_user), holder.user);
+                                                                    mContext.startActivity(intent);
                                                                 }
 
-//                            Intent intent = new Intent(mContext, ProfileActivity.class);
-//                            intent.putExtra(mContext.getString(R.string.calling_activity),
-//                                    mContext.getString(R.string.home_activity));
-//                            intent.putExtra(mContext.getString(R.string.intent_user), holder.user);
-//                            mContext.startActivity(intent);
+
                                                             }
                     );
 
@@ -258,11 +276,13 @@ public class MainListAdapter extends ArrayAdapter<Post> {
                     holder.comment.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((MainActivity)mContext).onCommentThreadSelected(getItem(position),
-                                    mContext.getString(R.string.home_activity));
-
-                            //another thing?
-//                            ((MainActivity)mContext).hideLayout();
+                            Intent intent=new Intent(mContext, Comment_activity.class);
+                            intent.putExtra("id",holder.post.getPost_id());
+                            intent.putExtra("user_id",holder.post.getUser_id());
+                            intent.putExtra("type",holder.post.getPost_type());
+                            intent.putExtra(mContext.getString(R.string.calling_activity),
+                                    mContext.getString(R.string.home_fragment));
+                            mContext.startActivity(intent);
                         }
                     });
                 }
@@ -272,6 +292,35 @@ public class MainListAdapter extends ArrayAdapter<Post> {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+        holder.share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.post.getPost_type().equals("1")) {
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) holder.image.getDrawable();
+                    if(bitmapDrawable==null) {
+                        Toast.makeText(mContext, "Please wait for the image to be load", Toast.LENGTH_SHORT).show();
+       }else {
+          Log.d(TAG, "It's" + holder.image.getDrawable().toString());
+         Bitmap bitmap = bitmapDrawable.getBitmap();
+        shareImageAndText(holder.post.getCaption(), bitmap);
+     }
+
+                }else {
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, holder.post.getCaption());
+                    shareIntent.setType("text/plain");
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    try {
+                        mContext.startActivity(shareIntent);
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
             }
         });
 
@@ -324,9 +373,10 @@ public class MainListAdapter extends ArrayAdapter<Post> {
         }
     }
 
-    public class GestureListener extends GestureDetector.SimpleOnGestureListener{
+    public class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
         ViewHolder mHolder;
+
         public GestureListener(ViewHolder holder) {
             mHolder = holder;
         }
@@ -337,51 +387,46 @@ public class MainListAdapter extends ArrayAdapter<Post> {
         }
 
         @Override
-        public boolean onDoubleTap(MotionEvent e) {
+        public boolean onSingleTapUp(MotionEvent e) {
             Log.d(TAG, "onDoubleTap: double tap detected.");
 
             Log.d(TAG, "onDoubleTap: clicked on post: " + mHolder.post.getPost_id());
 
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_user_posts));
             Query query = reference
-                    .child(mContext.getString(R.string.dbname_user_posts))
                     .child(mHolder.post.getUser_id())
                     .child("likes")
                     .child(mHolder.post.getPost_id());
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
+                    for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
 
                         String keyID = singleSnapshot.getKey();
-
                         //case1: Then user already liked the photo
-                        if(mHolder.likeByCurrentUser
-//                                && singleSnapshot.getValue(Like.class).getUser_id()
-//                                        .equals(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        ){
-                              if(mHolder.post.getPost_type().equals("0")){
-                                  mReference.child(mContext.getString(R.string.dbname_user_texts))
-                                          .child(mHolder.post.getUser_id())
-                                          .child("likes")
-                                          .child(mHolder.post.getPost_id())
-                                          .child(keyID)
-                                          .removeValue();
+                        if (mHolder.likeByCurrentUser
+                        ) {
+                            if (mHolder.post.getPost_type().equals("0")) {
+                                mReference.child(mContext.getString(R.string.dbname_user_texts))
+                                        .child(mHolder.post.getUser_id())
+                                        .child("likes")
+                                        .child(mHolder.post.getPost_id())
+                                        .child(keyID)
+                                        .removeValue();
 
-                              }else if(mHolder.post.getPost_type().equals("1")){
-                                  mReference.child(mContext.getString(R.string.dbname_user_photos))
-                                          .child(mHolder.post.getUser_id())
-                                          .child("likes")
-                                          .child(mHolder.post.getPost_id())
-                                          .child(keyID)
-                                          .removeValue();
-                              }
+                            } else if (mHolder.post.getPost_type().equals("1")) {
+                                mReference.child(mContext.getString(R.string.dbname_user_photos))
+                                        .child(mHolder.post.getUser_id())
+                                        .child("likes")
+                                        .child(mHolder.post.getPost_id())
+                                        .child(keyID)
+                                        .removeValue();
+                            }
 
 ///
                             mReference.child(mContext.getString(R.string.dbname_user_posts))
                                     .child(mHolder.post.getUser_id())
                                     .child("likes")
-//                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .child(mHolder.post.getPost_id())
                                     .child(keyID)
                                     .removeValue();
@@ -390,7 +435,7 @@ public class MainListAdapter extends ArrayAdapter<Post> {
                             getLikesString(mHolder);
                         }
                         //case2: The user has not liked the photo
-                        else if(!mHolder.likeByCurrentUser){
+                        else if (!mHolder.likeByCurrentUser) {
 
                             addNewLike(mHolder);
                             break;
@@ -398,7 +443,7 @@ public class MainListAdapter extends ArrayAdapter<Post> {
                         }
 
                     }
-                    if(!dataSnapshot.exists()){
+                    if (!dataSnapshot.exists()) {
                         addNewLike(mHolder);
 
                     }
@@ -413,8 +458,12 @@ public class MainListAdapter extends ArrayAdapter<Post> {
 
             return true;
         }
-    }
 
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            return true;
+        }
+    }
     private void addNewLike(final ViewHolder holder){
         Log.d(TAG, "addNewLike: adding new like");
 
@@ -482,9 +531,11 @@ public class MainListAdapter extends ArrayAdapter<Post> {
         try{
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
             Query query = reference
-                    .child(mContext.getString(R.string.dbname_posts))
-                    .child(holder.post.getPost_id())
-                    .child(mContext.getString(R.string.field_likes));
+                    .child(mContext.getString(R.string.dbname_user_posts))
+                    .child(holder.post.getUser_id())
+                    .child(mContext.getString(R.string.field_likes))
+                    .child(holder.post.getPost_id());
+
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

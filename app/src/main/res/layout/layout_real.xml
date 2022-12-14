@@ -74,25 +74,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="centerCrop" />
-        <!--        <ImageView-->
-        <!--            android:id="@+id/post_image"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="240dp"-->
-        <!--            />-->
+<!--        <ImageView-->
+<!--            android:id="@+id/post_image"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="240dp"-->
+<!--            />-->
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+<!--        <FrameLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
 
-                    <VideoView
-                        android:id="@+id/post_video"
-                        android:layout_width="match_parent"
-                        android:layout_marginTop="8dp"
-                        android:layout_gravity="center"
-                        android:saveEnabled="false"
-                        android:layout_height="250dp"/>
+<!--            <VideoView-->
+<!--                android:id="@+id/pvideo"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:saveEnabled="false"-->
+<!--                android:layout_height="8dp"/>-->
 
-                </FrameLayout>
+<!--        </FrameLayout>-->
 
         <RelativeLayout
             android:layout_width="match_parent"

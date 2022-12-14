@@ -33,11 +33,9 @@ public class TextsFragment extends Fragment {
     private ArrayList<String> mFollowing;
     private ArrayList<UserAccountSettings> mUserAccountSettings;
     private List<Post> posts;
-    private static final String TAG = "VideoActivity";
     private int resultsCount = 0;
-    private RelativeLayout relativeLayout;
-    ListView recyclerView;
-    MainFeedListAdapter postsAdapter;
+    private ListView recyclerView;
+    private MainFeedListAdapter postsAdapter;
 
     public TextsFragment() {
 
@@ -52,7 +50,7 @@ public class TextsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view=inflater.inflate(R.layout.fragment_text, container, false);
 
         recyclerView =view.findViewById(R.id.textRecycler);

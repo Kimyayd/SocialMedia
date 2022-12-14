@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -30,37 +29,21 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.kimyayd.youpost.R;
 import com.kimyayd.youpost.home.SectionPagerAdapter;
-import com.kimyayd.youpost.models.Comment;
-import com.kimyayd.youpost.models.Like;
-import com.kimyayd.youpost.models.Photo;
+import com.kimyayd.youpost.message.MessageActivity;
 import com.kimyayd.youpost.models.User;
 import com.kimyayd.youpost.models.UserAccountSettings;
 import com.kimyayd.youpost.models.UserSettings;
 import com.kimyayd.youpost.utils.FirebaseMethods;
-import com.kimyayd.youpost.utils.GridImageAdapter;
 import com.kimyayd.youpost.utils.UniversalImageLoader;
-import com.kimyayd.youpost.utils.ViewProfilFragment;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewProfilActivity extends AppCompatActivity {
     private static final String TAG = "ProfileFragment";
-
-
-    public interface OnGridImageSelectedListener{
-        void onGridImageSelected(Photo photo, int activityNumber);
-    }
-    ViewProfilFragment.OnGridImageSelectedListener mOnGridImageSelectedListener;
-
-    private static final int ACTIVITY_NUM = 4;
-    private static final int NUM_GRID_COLUMNS = 3;
 
     //firebase
     private FirebaseAuth mAuth;
@@ -76,13 +59,11 @@ public class ViewProfilActivity extends AppCompatActivity {
             mFollow, mUnfollow ;
     private ProgressBar mProgressBar;
     private CircleImageView mProfilePhoto;
-    private GridView gridView;
-    private ImageView mBackArrow;
+    private ImageView mBackArrow,message;
     private Context mContext;
-    private TextView editProfile;
+
 
     private ViewPager2 mViewPager;
-    private FrameLayout mFrameLayout;
     private ArrayList<Fragment> arr;
 
     //vars
@@ -90,28 +71,25 @@ public class ViewProfilActivity extends AppCompatActivity {
     private int mFollowersCount = 0;
     private int mFollowingCount = 0;
     private int mPostsCount = 0;
-
-
-
+    private int mVideosCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_profil);
-        mDisplayName = (TextView) findViewById(R.id.display_name);
-        mUsername = (TextView) findViewById(R.id.username);
-        mWebsite = (TextView) findViewById(R.id.website);
-        mDescription = (TextView) findViewById(R.id.description);
-        mProfilePhoto = (CircleImageView) findViewById(R.id.profile_photo);
-        mPosts = (TextView) findViewById(R.id.tvPosts);
-        mFollowers = (TextView) findViewById(R.id.tvFollowers);
-        mFollowing = (TextView) findViewById(R.id.tvFollowing);
-        mProgressBar = (ProgressBar) findViewById(R.id.profileProgressBar);
-        gridView = (GridView) findViewById(R.id.gridView);
-        mFollow = (TextView) findViewById(R.id.follow);
-        mUnfollow = (TextView) findViewById(R.id.unfollow);
-        editProfile = (TextView) findViewById(R.id.textEditProfile);
-        mBackArrow = (ImageView) findViewById(R.id.backArrow);
+        mDisplayName =  findViewById(R.id.display_name);
+        mUsername =  findViewById(R.id.username);
+        message =  findViewById(R.id.user_message);
+        mWebsite =  findViewById(R.id.website);
+        mDescription =  findViewById(R.id.description);
+        mProfilePhoto =  findViewById(R.id.profile_photo);
+        mPosts =  findViewById(R.id.tvPosts);
+        mFollowers =  findViewById(R.id.tvFollowers);
+        mFollowing =  findViewById(R.id.tvFollowing);
+        mProgressBar =  findViewById(R.id.profileProgressBar);
+        mFollow =  findViewById(R.id.follow);
+        mUnfollow =  findViewById(R.id.unfollow);
+        mBackArrow =  findViewById(R.id.backArrow);
         mContext = ViewProfilActivity.this;
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
         Log.d(TAG, "onCreateView: stared.");
@@ -124,7 +102,7 @@ public class ViewProfilActivity extends AppCompatActivity {
         mViewPager=findViewById(R.id.viewpager_container);
         mViewPager.setAdapter(adapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout =  findViewById(R.id.tabs);
         new TabLayoutMediator(tabLayout, mViewPager,
                 (tab, position) -> tab.getCustomView()
         ).attach();
@@ -134,14 +112,20 @@ public class ViewProfilActivity extends AppCompatActivity {
 
         try {
             mUser = getUserFromBundle();
-            Toast.makeText(mContext, "Something went good: " + mUser.toString(), Toast.LENGTH_SHORT).show();
             init();
         } catch (NullPointerException e) {
             Log.e(TAG, "onCreateView: NullPointerException: " + e.getMessage());
-            Toast.makeText(mContext, "something went wrong", Toast.LENGTH_SHORT).show();
             getSupportFragmentManager().popBackStack();
         }
 
+   message.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        Intent intent=new Intent(mContext, MessageActivity.class);
+        intent.putExtra("userid",mUser.getUser_id());
+        mContext.startActivity(intent);
+    }
+    });
         setupFirebaseAuth();
 
         isFollowing();
@@ -191,16 +175,6 @@ public class ViewProfilActivity extends AppCompatActivity {
         } else {
             mFollow.setVisibility(View.GONE);
             mUnfollow.setVisibility(View.GONE);
-            editProfile.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "onClick: navigating to " + mContext.getString(R.string.edit_profile_fragment));
-                    Intent intent = new Intent(getApplicationContext(), AccountSettingsActivity.class);
-                    intent.putExtra(getString(R.string.calling_activity), getString(R.string.profile_activity));
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                }
-            });
         }
     }
     public User getUserFromBundle(){
@@ -367,10 +341,12 @@ public class ViewProfilActivity extends AppCompatActivity {
 
     private void getPostsCount(){
         mPostsCount = 0;
+        mVideosCount = 0;
+
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        Query query = reference.child(getString(R.string.dbname_user_photos))
-                .child(mUser.getUser_id());
+        Query query = reference.child(getString(R.string.dbname_user_posts))
+                .child(mUser.getUser_id()).child("post");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -378,7 +354,25 @@ public class ViewProfilActivity extends AppCompatActivity {
                     Log.d(TAG, "onDataChange: found post:" + singleSnapshot.getValue());
                     mPostsCount++;
                 }
-                mPosts.setText(String.valueOf(mPostsCount));
+                Query querys = reference.child(getString(R.string.dbname_user_videos))
+                        .child(mUser.getUser_id()).child("video");
+                querys.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
+                            Log.d(TAG, "onDataChange: found post:" + singleSnapshot.getValue());
+                            mVideosCount++;
+                        }
+                        mPosts.setText(String.valueOf(mPostsCount+mVideosCount));
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
             }
 
             @Override
@@ -386,61 +380,22 @@ public class ViewProfilActivity extends AppCompatActivity {
 
             }
         });
+
+
     }
 
     private void setFollowing(){
         Log.d(TAG, "setFollowing: updating UI for following this user");
         mFollow.setVisibility(View.GONE);
         mUnfollow.setVisibility(View.VISIBLE);
-        editProfile.setVisibility(View.GONE);
+
     }
 
     private void setUnfollowing(){
         Log.d(TAG, "setFollowing: updating UI for unfollowing this user");
         mFollow.setVisibility(View.VISIBLE);
         mUnfollow.setVisibility(View.GONE);
-        editProfile.setVisibility(View.GONE);
     }
-
-    private void setCurrentUsersProfile(){
-        Log.d(TAG, "setFollowing: updating UI for showing this user their own profile");
-        mFollow.setVisibility(View.GONE);
-        mUnfollow.setVisibility(View.GONE);
-        editProfile.setVisibility(View.VISIBLE);
-    }
-
-    private void setupImageGrid(final ArrayList<Photo> photos){
-        //setup our image grid
-        int gridWidth = getResources().getDisplayMetrics().widthPixels;
-        int imageWidth = gridWidth/NUM_GRID_COLUMNS;
-        gridView.setColumnWidth(imageWidth);
-
-        ArrayList<String> imgUrls = new ArrayList<String>();
-        for(int i = 0; i < photos.size(); i++){
-            imgUrls.add(photos.get(i).getImage_path());
-        }
-        GridImageAdapter adapter = new GridImageAdapter(getApplicationContext(),R.layout.layout_grid_imageview,
-                "", imgUrls);
-        gridView.setAdapter(adapter);
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mOnGridImageSelectedListener.onGridImageSelected(photos.get(position), ACTIVITY_NUM);
-            }
-        });
-    }
-
-//    @Override
-//    public void onAttach(Context context) {
-//        try{
-//            mOnGridImageSelectedListener = (ViewProfilFragment.OnGridImageSelectedListener) getActivity();
-//        }catch (ClassCastException e){
-//            Log.e(TAG, "onAttach: ClassCastException: " + e.getMessage() );
-//        }
-//        super.onAttach(context);
-//    }
-
 
     private void setProfileWidgets(UserSettings userSettings){
         UserAccountSettings settings = userSettings.getSettings();
@@ -470,12 +425,6 @@ public class ViewProfilActivity extends AppCompatActivity {
         });
 
     }
-
-
-    /**
-     * BottomNavigationView setup
-     */
-
 
       /*
     ------------------------------------ Firebase ---------------------------------------------

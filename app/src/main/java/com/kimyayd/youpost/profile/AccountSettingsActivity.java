@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -17,7 +15,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.kimyayd.youpost.R;
 import com.kimyayd.youpost.utils.FirebaseMethods;
 import com.kimyayd.youpost.utils.SectionsStatePagerAdapter;
@@ -40,14 +37,13 @@ public class AccountSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_accountsettings);
         mContext=AccountSettingsActivity.this;
         Log.d(TAG,"onCreate: started");
-        viewPager=(ViewPager2) findViewById(R.id.viewpager_container);
-        mRelativeLayout=(RelativeLayout) findViewById(R.id.relLayout1);
+        viewPager= findViewById(R.id.viewpager_container);
+        mRelativeLayout=findViewById(R.id.relLayout1);
 
         setupSettingsList();
-//        setupBottomNavigationView();
         getIncomingIntent();
 
-        ImageView backArrow=(ImageView) findViewById(R.id.backArrow);
+        ImageView backArrow= findViewById(R.id.backArrow);
         backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,8 +58,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
 
         if(intent.hasExtra(getString(R.string.selected_image))
                 || intent.hasExtra(getString(R.string.selected_bitmap))){
-
-            //if there is an imageUrl attached as an extra, then it was chosen from the gallery/photo fragment
             Log.d(TAG, "getIncomingIntent: New incoming imgUrl");
 
             if(intent.getStringExtra(getString(R.string.return_to_fragment)).equals(getString(R.string.edit_profile_fragment))){
@@ -90,7 +84,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
             pagerAdapter.addFragment(new EditProfileFragment(),getString(R.string.edit_your_profile));
             pagerAdapter.addFragment(new SignOutFragment(),getString(R.string.sign_out));
             Log.d(TAG, "getIncomingIntent: received incoming intent from "+pagerAdapter.getFragmentName(0)+" " + getString(R.string.profile_activity));
-            Toast.makeText(mContext, pagerAdapter.getFragmentName(0), Toast.LENGTH_SHORT).show();
             viewPager.setAdapter(pagerAdapter);
             viewPager.setCurrentItem(pagerAdapter.getFragmentNumber(getString(R.string.edit_your_profile)));
             Log.d(TAG,"Here's it come: ");
@@ -103,15 +96,13 @@ public class AccountSettingsActivity extends AppCompatActivity {
         SectionsStatePagerAdapter pagerAdapter=new SectionsStatePagerAdapter(this);
         pagerAdapter.addFragment(new EditProfileFragment(),getString(R.string.edit_profile_fragment));
         pagerAdapter.addFragment(new SignOutFragment(),getString(R.string.sign_out));
-        Toast.makeText(AccountSettingsActivity.this, "It's okayyyy izzoudine "+ fragmentNumber+"edddddddd", Toast.LENGTH_SHORT).show();
 
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(fragmentNumber);
-        Toast.makeText(AccountSettingsActivity.this, "It's okayyyy izzoudine "+ fragmentNumber, Toast.LENGTH_SHORT).show();
     }
     private void setupSettingsList(){
         Log.d(TAG, "setupSettingsList: initializing 'Account Settings' list.");
-        ListView listView = (ListView) findViewById(R.id.lvAccountSettings);
+        ListView listView = findViewById(R.id.lvAccountSettings);
 
         ArrayList<String> options = new ArrayList<>();
         options.add(getString(R.string.edit_profile_fragment)); //fragment 0

@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,6 +35,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kimyayd.youpost.R;
+import com.kimyayd.youpost.message.MessageActivity;
+import com.kimyayd.youpost.models.Chat;
 import com.kimyayd.youpost.models.Comment;
 import com.kimyayd.youpost.models.RealVideo;
 import com.kimyayd.youpost.models.Video;
@@ -45,7 +48,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class Comment_activity extends AppCompatActivity {
+public class Comment__activity extends AppCompatActivity {
     private static final String TAG = "Comment_activity";
 
     private FirebaseAuth mAuth;
@@ -59,19 +62,19 @@ public class Comment_activity extends AppCompatActivity {
 
     private ArrayList<Comment> comments;
     private Context mContext;
-    private String video_id,user_id,type,calling_activity;
+    private String video_id,user_id,type;
     private RelativeLayout no_comment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
-        mContext = Comment_activity.this;
+        mContext = Comment__activity.this;
         Intent intent = getIntent();
         video_id = intent.getStringExtra("id");
         user_id = intent.getStringExtra("user_id");
-        calling_activity = intent.getStringExtra(mContext.getString(R.string.calling_activity));
         type = intent.getStringExtra("type");
+        Toast.makeText(mContext, "Hi "+video_id+user_id+type, Toast.LENGTH_SHORT).show();
 
         mBackArrow =  findViewById(R.id.backArrow);
         mCheckMark =  findViewById(R.id.ivPostComment);
@@ -85,8 +88,8 @@ public class Comment_activity extends AppCompatActivity {
     }
 
     private void getComments(){
-        if(calling_activity.equals(mContext.getString(R.string.home_fragment))) {
-           if(type.equals("0")||type.equals("1")){
+
+            if(type.equals("0")||type.equals("1")){
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user_posts").child(user_id).child("comments").child(video_id);
                 ref.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -119,7 +122,7 @@ public class Comment_activity extends AppCompatActivity {
                                                 dialog.dismiss();
                                                 String message = comment.getComment();
                                                 setClipboard(mContext.getApplicationContext(), message);
-                                                Toast.makeText(Comment_activity.this, "Copied", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Comment__activity.this, "Copied", Toast.LENGTH_SHORT).show();
 
                                             }
                                         });
@@ -139,7 +142,7 @@ public class Comment_activity extends AppCompatActivity {
                                                     ref.addValueEventListener(new ValueEventListener() {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                            Toast.makeText(Comment_activity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(Comment__activity.this, "Deleted", Toast.LENGTH_SHORT).show();
                                                         }
 
                                                         @Override
@@ -169,7 +172,107 @@ public class Comment_activity extends AppCompatActivity {
                                     else{
                                         String message = comment.getComment();
                                         setClipboard(mContext.getApplicationContext(), message);
-                                        Toast.makeText(Comment_activity.this, "Copied", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Comment__activity.this, "Copied", Toast.LENGTH_SHORT).show();
+                                    }
+                                    return true;
+                                }
+                            });
+                        } else {
+                            no_comment.setVisibility(View.VISIBLE);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+            else if(type.equals("2")){
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user_videos").child(user_id).child("comments").child(video_id);
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        comments.clear();
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            Comment modelComment = ds.getValue(Comment.class);
+                            comments.add(modelComment);
+                        }
+                        no_comment = findViewById(R.id.relLayout2);
+                        if (!(comments.size() == 0)) {
+                            no_comment.setVisibility(View.GONE);
+                            Comment_Adapter commentAdapter = new Comment_Adapter(getApplicationContext(), R.layout.layout_comment, comments, user_id, video_id);//set adapter
+                            listView.setAdapter(commentAdapter);
+                            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                @Override
+                                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                    Comment comment = comments.get(i);
+                                    if (comment.getUser_id().equals( FirebaseAuth.getInstance().getCurrentUser().getUid())){
+
+                                        final Dialog dialog = new Dialog(mContext);
+                                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                        dialog.setContentView(R.layout.pop_thing);
+                                        LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
+                                        LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
+
+                                        layoutCopy.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                String message = comment.getComment();
+                                                setClipboard(mContext.getApplicationContext(), message);
+                                                Toast.makeText(Comment__activity.this, "Copied", Toast.LENGTH_SHORT).show();
+
+                                            }
+                                        });
+
+                                        layoutDelete.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(view.getRootView().getContext());
+                                                builder.setTitle("Delete");
+                                                builder.setMessage("Are you sure you want to delete this comment ?");
+                                                builder.setPositiveButton("YES", (dialogInterface, i) -> {
+                                                    //delete comment
+                                                    dialog.dismiss();
+                                                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user_posts");
+                                                    ref.child(comment.getUser_id()).child("comments").child(comment.getPost_id()).child(comment.getComment_id()).removeValue();
+                                                    ref.addValueEventListener(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                            Toast.makeText(Comment__activity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                                        }
+                                                    });
+
+
+                                                });
+                                                builder.setNegativeButton("NO", (dialogInterface, i) -> {
+                                                    //dismiss dialog
+                                                    dialogInterface.dismiss();
+                                                });
+                                                //show dialog
+                                                builder.create().show();
+                                            }
+                                        });
+
+                                        dialog.show();
+                                        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                                        dialog.getWindow().setGravity(Gravity.BOTTOM);
+
+                                    }
+                                    else{
+                                        String message = comment.getComment();
+                                        setClipboard(mContext.getApplicationContext(), message);
+                                        Toast.makeText(Comment__activity.this, "Copied", Toast.LENGTH_SHORT).show();
                                     }
                                     return true;
                                 }
@@ -188,110 +291,13 @@ public class Comment_activity extends AppCompatActivity {
                 });
             }
         }
-        else if(calling_activity.equals(mContext.getString(R.string.video_activity))){
+    public void  setClipboard(Context context, String text) {
+        android.content.ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("Copied Text", text);
+        clipboard.setPrimaryClip(clip);
 
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user_videos").child(user_id).child("comments").child(video_id);
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    comments.clear();
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        Comment modelComment = ds.getValue(Comment.class);
-                        comments.add(modelComment);
-
-                    }
-                    no_comment = findViewById(R.id.relLayout2);
-                    if (!(comments.size() == 0)) {
-                        no_comment.setVisibility(View.GONE);
-                        Comment_Adapter commentAdapter = new Comment_Adapter(getApplicationContext(), R.layout.layout_comment, comments, user_id, video_id);//set adapter
-                        listView.setAdapter(commentAdapter);
-                        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                            @Override
-                            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                Comment comment = comments.get(i);
-                                if (comment.getUser_id().equals( FirebaseAuth.getInstance().getCurrentUser().getUid())){
-
-                                    final Dialog dialog = new Dialog(mContext);
-                                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                                    dialog.setContentView(R.layout.pop_thing);
-                                    LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
-                                    LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
-
-                                    layoutCopy.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            dialog.dismiss();
-                                            String message = comment.getComment();
-                                            setClipboard(mContext.getApplicationContext(), message);
-                                            Toast.makeText(Comment_activity.this, "Copied", Toast.LENGTH_SHORT).show();
-
-                                        }
-                                    });
-
-                                    layoutDelete.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            dialog.dismiss();
-                                            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(view.getRootView().getContext());
-                                            builder.setTitle("Delete");
-                                            builder.setMessage("Are you sure you want to delete this comment ?");
-                                            builder.setPositiveButton("YES", (dialogInterface, i) -> {
-                                                //delete comment
-                                                dialog.dismiss();
-                                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user_videos");
-                                                ref.child(comment.getUser_id()).child("comments").child(comment.getPost_id()).child(comment.getComment_id()).removeValue();
-                                                ref.addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                        Toast.makeText(Comment_activity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                                    }
-                                                });
-
-
-                                            });
-                                            builder.setNegativeButton("NO", (dialogInterface, i) -> {
-                                                //dismiss dialog
-                                                dialogInterface.dismiss();
-                                            });
-                                            //show dialog
-                                            builder.create().show();
-                                        }
-                                    });
-
-                                    dialog.show();
-                                    dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                    dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-                                    dialog.getWindow().setGravity(Gravity.BOTTOM);
-
-                                }
-                                else{
-                                    String message = comment.getComment();
-                                    setClipboard(mContext.getApplicationContext(), message);
-                                    Toast.makeText(Comment_activity.this, "Copied", Toast.LENGTH_SHORT).show();
-                                }
-                                return true;
-                            }
-                        });
-
-                    } else {
-                        no_comment.setVisibility(View.VISIBLE);
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
     }
+
 
     private void closeKeyboard(){
         View view = getCurrentFocus();
@@ -313,44 +319,41 @@ public class Comment_activity extends AppCompatActivity {
         hashMap.put("comment_id", commentID);
         hashMap.put("date_created",getTimestamp());
 
-        if(calling_activity.equals(mContext.getString(R.string.home_fragment))) {
-    if(type.equals("0")){
-    //insert into user_photos node
-    myRef.child(getString(R.string.dbname_user_texts))
-            .child(user_id)
-            .child(getString(R.string.field_comments))
-            .child(video_id)
-            .child(commentID)
-            .setValue(hashMap);
-        myRef.child(getString(R.string.dbname_user_posts))
-                .child(user_id)
-                .child(getString(R.string.field_comments))
-                .child(video_id)
-                .child(commentID)
-                .setValue(hashMap);
-      }
-    else if(type.equals("1")){
-        myRef.child(getString(R.string.dbname_user_photos))
-                .child(user_id)
-                .child(getString(R.string.field_comments))
-                .child(video_id)
-                .child(commentID)
-                .setValue(hashMap);
-        myRef.child(getString(R.string.dbname_user_posts))
-                .child(user_id)
-                .child(getString(R.string.field_comments))
-                .child(video_id)
-                .child(commentID)
-                .setValue(hashMap);
-    }
-}else if(calling_activity.equals(mContext.getString(R.string.video_activity))){
-    myRef.child(getString(R.string.dbname_user_videos))
-            .child(user_id)
-            .child(getString(R.string.field_comments))
-            .child(video_id)
-            .child(commentID)
-            .setValue(hashMap);
-}
+            if(type.equals("0")){
+                myRef.child(getString(R.string.dbname_user_texts))
+                        .child(user_id)
+                        .child(getString(R.string.field_comments))
+                        .child(video_id)
+                        .child(commentID)
+                        .setValue(hashMap);
+                myRef.child(getString(R.string.dbname_user_posts))
+                        .child(user_id)
+                        .child(getString(R.string.field_comments))
+                        .child(video_id)
+                        .child(commentID)
+                        .setValue(hashMap);
+            }
+            else if(type.equals("1")){
+                myRef.child(getString(R.string.dbname_user_photos))
+                        .child(user_id)
+                        .child(getString(R.string.field_comments))
+                        .child(video_id)
+                        .child(commentID)
+                        .setValue(hashMap);
+                myRef.child(getString(R.string.dbname_user_posts))
+                        .child(user_id)
+                        .child(getString(R.string.field_comments))
+                        .child(video_id)
+                        .child(commentID)
+                        .setValue(hashMap);
+            }else if(type.equals("2")){
+                myRef.child(getString(R.string.dbname_user_videos))
+                        .child(user_id)
+                        .child(getString(R.string.field_comments))
+                        .child(video_id)
+                        .child(commentID)
+                        .setValue(hashMap);
+            }
 
     }
 
@@ -361,7 +364,7 @@ public class Comment_activity extends AppCompatActivity {
     }
 
     /**
-     * retrieve the photo from the incoming bundle from profileActivity interface
+     * retrieve the post from the incoming bundle from profileActivity interface
      * @return
      */
 
@@ -369,6 +372,7 @@ public class Comment_activity extends AppCompatActivity {
         mCheckMark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(mContext, "It worked", Toast.LENGTH_SHORT).show();
 
                 if(!mComment.getText().toString().equals("")){
                     Log.d(TAG, "onClick: attempting to submit new comment.");
@@ -378,7 +382,7 @@ public class Comment_activity extends AppCompatActivity {
                     closeKeyboard();
                     getComments();
                 }else{
-                    Toast.makeText(Comment_activity.this, "You can't post a blank comment", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Comment__activity.this, "You can't post a blank comment", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -386,23 +390,14 @@ public class Comment_activity extends AppCompatActivity {
         mBackArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(mContext, "Back", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onClick: navigating back");
                 finish();
             }
         });
     }
 
-    public void  setClipboard(Context context, String text) {
-        android.content.ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("Copied Text", text);
-        clipboard.setPrimaryClip(clip);
-
-    }
-
-
-
     private void setupFirebaseAuth(){
-        Log.d(TAG,"The moment real is: "+  ("kimyayd"));
         Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -415,10 +410,8 @@ public class Comment_activity extends AppCompatActivity {
 
 
                 if (user != null) {
-
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
-
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
             }

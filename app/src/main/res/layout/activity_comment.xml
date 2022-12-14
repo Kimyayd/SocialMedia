@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -11,18 +12,36 @@
         <include layout="@layout/snippet_comments_toolbar"/>
 
     </RelativeLayout>
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/relLayout2"
         android:layout_below="@+id/relLayout1"
         android:layout_marginBottom="60dp">
 
-        <ListView
+        <ImageView
+            android:id="@+id/no_comment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/listView"></ListView>
+            android:src="@drawable/comment"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relLayout3"
+        android:layout_below="@+id/relLayout2"
+        android:layout_marginBottom="60dp">
+
+        <ListView
+            android:id="@+id/comment_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/layout_comment" />
+
+
 
 
     </RelativeLayout>
@@ -30,7 +49,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:id="@+id/relLayout3"
+        android:id="@+id/relLayout4"
         android:layout_alignParentBottom="true"
         android:background="@drawable/white_grey_border_top">
 

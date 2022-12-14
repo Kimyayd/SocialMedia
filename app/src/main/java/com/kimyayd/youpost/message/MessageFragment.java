@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class NotificationFragment extends Fragment{
+public class MessageFragment extends Fragment{
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
@@ -41,32 +41,20 @@ public class NotificationFragment extends Fragment{
     private DatabaseReference reference;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private TextView textView;
-    private ImageView imageView;
-    FirebaseUser fuser;
+    private FirebaseUser fuser;
 
     private static final String TAG = "NotificationFragment";
-    private final List<Chat> mChats = new ArrayList<>();
     private Context mContext=getContext();
-    DatabaseReference databaseReference;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
         setupFirebaseAuth();
-        // Inflate the layout for this fragment
-//        imageView=view.findViewById(R.id.back);
         textView =view.findViewById(R.id.messages);
         recyclerView=view.findViewById(R.id.recyclerView_message);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        imageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                getActivity().finish();
-//            }
-//        });
 
         fuser= FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("chats");
@@ -137,16 +125,14 @@ public class NotificationFragment extends Fragment{
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                //check if the user is logged in
-
                 if (user != null) {
-                    // User is signed in
+
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
-                    // User is signed out
+
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-                // ...
+
             }
         };
     }
