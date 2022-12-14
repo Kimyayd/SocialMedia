@@ -34,13 +34,11 @@ public class VideosFragment extends Fragment {
     private ArrayList<String> mFollowing;
     private ArrayList<UserAccountSettings> mUserAccountSettings;
     private List<Post> posts;
-    private static final String TAG = "VideoActivity";
     private int resultsCount = 0;
-    private RelativeLayout relativeLayout;
-    ListView recyclerView;
-    MainFeedListAdapter postsAdapter;
+    private ListView recyclerView;
+    private MainFeedListAdapter postsAdapter;
     public VideosFragment() {
-        // Required empty public constructor
+
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -133,6 +131,5 @@ public class VideosFragment extends Fragment {
             });
 
         }
-
 
 }

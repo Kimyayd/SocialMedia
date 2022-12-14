@@ -1,4 +1,4 @@
-package com.kimyayd.youpost.utils;
+package com.kimyayd.youpost.message;
 
 import android.content.Context;
 import android.util.Log;
@@ -33,8 +33,6 @@ public class MessAdapter extends ArrayAdapter<Chat> {
 
     public static final int MSG_TITLE_LEFT=0;
     public static final int MSG_TITLE_RIGHT=1;
-    private static final String TAG = "UserListAdapter";
-
 
     private LayoutInflater mInflater;
     private List<Chat> mChats = null;
@@ -55,7 +53,6 @@ public class MessAdapter extends ArrayAdapter<Chat> {
 
     private static class ViewHolder{
         TextView show_message;
-        ImageView profile_image;
         TextView txt_seen;
 
     }
@@ -70,12 +67,11 @@ public class MessAdapter extends ArrayAdapter<Chat> {
            if(convertView ==null){
                convertView = mInflater.inflate(R.layout.chat_item_left, parent, false);
                holder = new ViewHolder();
-               holder.show_message = (TextView) convertView.findViewById(R.id.show_message);
-               holder.txt_seen = (TextView) convertView.findViewById(R.id.txt_seen);
+               holder.show_message = convertView.findViewById(R.id.show_message);
+               holder.txt_seen =  convertView.findViewById(R.id.txt_seen);
                convertView.setTag(holder);
 
                Chat chat = mChats.get(position);
-//               if (!chat.isReceiver_delete()){
                    holder.show_message.setText(chat.getMessage());
 
                    if (position == mChats.size() - 1) {
@@ -87,9 +83,6 @@ public class MessAdapter extends ArrayAdapter<Chat> {
                    } else {
                        holder.txt_seen.setVisibility(View.GONE);
                    }
-//               }else{
-////                   mChats.remove(position);
-//               }
 
            }else{
                holder = (ViewHolder) convertView.getTag();
@@ -100,8 +93,8 @@ public class MessAdapter extends ArrayAdapter<Chat> {
            if(convertView ==null) {
                convertView = mInflater.inflate(R.layout.chat_item_right, parent, false);
                holder = new ViewHolder();
-               holder.show_message = (TextView) convertView.findViewById(R.id.show_message);
-               holder.txt_seen = (TextView) convertView.findViewById(R.id.txt_seen);
+               holder.show_message = convertView.findViewById(R.id.show_message);
+               holder.txt_seen = convertView.findViewById(R.id.txt_seen);
                convertView.setTag(holder);
                Chat chat = mChats.get(position);
                if (!chat.isDelete()){

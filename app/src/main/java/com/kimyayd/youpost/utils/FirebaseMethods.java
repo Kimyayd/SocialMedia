@@ -24,12 +24,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.kimyayd.youpost.add.AddActivity;
-import com.kimyayd.youpost.home.HomeFragment;
-import com.kimyayd.youpost.models.Post;
+import com.kimyayd.youpost.MainActivity;
 import com.kimyayd.youpost.profile.AccountSettingsActivity;
 import com.kimyayd.youpost.R;
-import com.kimyayd.youpost.models.Photo;
 import com.kimyayd.youpost.models.User;
 import com.kimyayd.youpost.models.UserAccountSettings;
 import com.kimyayd.youpost.models.UserSettings;
@@ -408,8 +405,7 @@ public class FirebaseMethods {
                                 public void onSuccess(Uri uri) {
                                     Toast.makeText(mContext, "photo upload success", Toast.LENGTH_SHORT).show();
                                     addPhotoToDatabase(caption, uri.toString());
-                                    Intent intent = new Intent(mContext, AddActivity.class);
-                                    mContext.startActivity(intent);
+
 
                                     //createNewPost(imageUrl);
                                 }
@@ -423,6 +419,8 @@ public class FirebaseMethods {
                 public void onFailure(@NonNull Exception e) {
                     Log.d(TAG, "onFailure: Photo upload failed.");
                     Toast.makeText(mContext, "Photo upload failed ", Toast.LENGTH_SHORT).show();
+                    mContext.startActivity(new Intent(mContext, MainActivity.class));
+
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -431,6 +429,8 @@ public class FirebaseMethods {
                     if (progress - 15 > mPhotoUploadProgress) {
                         Toast.makeText(mContext, "Photo upload progress", Toast.LENGTH_SHORT).show();
                         mPhotoUploadProgress = progress;
+                        mContext.startActivity(new Intent(mContext, MainActivity.class));
+
                     }
                 }
             });
@@ -471,9 +471,6 @@ public class FirebaseMethods {
                                             ((AccountSettingsActivity)mContext).pagerAdapter
                                                     .getFragmentNumber(mContext.getString(R.string.edit_profile_fragment))
                                     );
-//                                    Intent intent = new Intent(mContext, HomeActivity.class);
-//                                    mContext.startActivity(intent);
-                                   // createNewPost(imageUrl);
 
                                 }
                             });
@@ -486,6 +483,8 @@ public class FirebaseMethods {
                 public void onFailure(@NonNull Exception e) {
                     Log.d(TAG, "onFailure: Photo upload failed.");
                     Toast.makeText(mContext, "Photo upload failed ", Toast.LENGTH_SHORT).show();
+                    mContext.startActivity(new Intent(mContext, MainActivity.class));
+
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -494,6 +493,7 @@ public class FirebaseMethods {
                     if (progress - 15 > mPhotoUploadProgress) {
                         Toast.makeText(mContext, "Photo upload progress", Toast.LENGTH_SHORT).show();
                         mPhotoUploadProgress = progress;
+                        mContext.startActivity(new Intent(mContext, MainActivity.class));
                     }
                 }
             });
@@ -503,7 +503,7 @@ public class FirebaseMethods {
     private void addPhotoToDatabase(String caption, String url){
         Log.d(TAG, "addPhotoToDatabase: adding photo to database.");
 
-        String newPostKey = myRef.child(mContext.getString(R.string.dbname_posts)).push().getKey();
+        String newPostKey = myRef.child(mContext.getString(R.string.dbname_user_posts)).push().getKey();
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("caption", caption);
@@ -525,7 +525,6 @@ public class FirebaseMethods {
                 .child("post")
                 .child(newPostKey)
                 .setValue(hashMap);
-
     }
     private String getTimestamp(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.FRENCH);

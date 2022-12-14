@@ -37,9 +37,8 @@ public class PhotopostsFragment extends Fragment {
     private List<Post> posts;
     private static final String TAG = "VideoActivity";
     private int resultsCount = 0;
-    private RelativeLayout relativeLayout;
-    ListView mListView;
-    MainFeedListAdapter postsAdapter;
+    private ListView mListView;
+    private MainFeedListAdapter postsAdapter;
 
     public PhotopostsFragment() {
 
@@ -54,7 +53,6 @@ public class PhotopostsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_photopost, container, false);
         mListView =view.findViewById(R.id.photoRecycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);

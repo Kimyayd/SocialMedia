@@ -35,7 +35,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.kimyayd.youpost.R;
 import com.kimyayd.youpost.models.Chat;
 import com.kimyayd.youpost.models.UserAccountSettings;
-import com.kimyayd.youpost.utils.MessAdapter;
 import com.kimyayd.youpost.utils.UniversalImageLoader;
 
 import java.text.SimpleDateFormat;
@@ -59,18 +58,13 @@ public class MessageActivity extends AppCompatActivity {
     EditText text_send;
     Intent intent;
     private Context mContext = MessageActivity.this;
-    private List<Chat> mChats;
     List<Chat> mchat;
-    private String imageurl;
     MessAdapter adapter;
     ListView listView;
 
     ValueEventListener seenListener;
     String userid;
     boolean notify = false;
-
-    public static final int MSG_TITLE_LEFT=0;
-    public static final int MSG_TITLE_RIGHT=1;
 
 
     @Override
@@ -155,7 +149,7 @@ public class MessageActivity extends AppCompatActivity {
     private void sendMessage(String sender,String receiver, String message) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        String chatId = reference.push().getKey();
+        String chatId = reference.child("chats").push().getKey();
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("id", chatId);
         hashMap.put("sender", sender);
@@ -355,7 +349,7 @@ public class MessageActivity extends AppCompatActivity {
 
     }
     private String getTimestamp(){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.CANADA);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.FRENCH);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT+1"));
         return sdf.format(new Date());
     }

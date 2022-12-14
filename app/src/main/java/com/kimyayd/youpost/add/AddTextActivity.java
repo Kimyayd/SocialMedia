@@ -1,5 +1,6 @@
 package com.kimyayd.youpost.add;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,10 +18,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kimyayd.youpost.MainActivity;
 import com.kimyayd.youpost.R;
-import com.kimyayd.youpost.models.Post;
-import com.kimyayd.youpost.models.Text;
-import com.kimyayd.youpost.utils.FirebaseMethods;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,7 +35,6 @@ public class AddTextActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference myRef;
-    private FirebaseMethods mFirebaseMethods;
     private int textCount = 1;
 
     public static final String TAG="AddTextActivity";
@@ -55,15 +53,13 @@ public class AddTextActivity extends AppCompatActivity {
             //upload the image to firebase
             Toast.makeText(AddTextActivity.this, "Attempting to post new text", Toast.LENGTH_SHORT).show();
             String post = text.getText().toString();
-
             addNewText(post);
-
 
         }
     });
     }
     public void addNewText(String text) {
-        String postID = myRef.push().getKey();
+        String postID = myRef.child("user_posts").push().getKey();
         String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -83,6 +79,7 @@ public class AddTextActivity extends AppCompatActivity {
                 .child("post")
                 .child(postID)
                 .setValue(hashMap);
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
     }
     private String getTimestamp(){
@@ -90,41 +87,6 @@ public class AddTextActivity extends AppCompatActivity {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT+1"));
         return sdf.format(new Date());
     }
-
-//    public void newText(String textType,final String post,final int count){
-//        Log.d(TAG, "uploadText: attempting to uplaod new text.");
-//            String textID = myRef.push().getKey();
-//            String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//
-//            String tags = StringManipulation.getTags(post);
-//            Text text = new Text();
-//            text.setCaption(tags);
-//            text.setDate_created(getTimestamp());
-//            text.setTags(tags);
-//            text.setUser_id(user_id);
-//            text.setText_id(textID);
-//
-//            myRef.child(getString(R.string.dbname_texts))
-//                    .child(textID)
-//                    .setValue(post);
-//        }
-
-
-        private void someMethod() {
-        /*
-            Step 1)
-            Create a data model for Text
-            Step 2)
-            Add properties to the Text Objects (caption, date,photo_id, tags, user_id)
-            Step 3)
-            Count the number of photos that the user already has.
-            Step 4)
-            a) Upload the photo to Firebase Storage
-            b) insert into 'photos' node
-            c) insert into 'user_photos' node
-         */
-        }
-
 
     private void setupFirebaseAuth(){
         Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
@@ -148,18 +110,12 @@ public class AddTextActivity extends AppCompatActivity {
             // ...
         };
 
-        Toast.makeText(AddTextActivity.this, "Everything is okay!!", Toast.LENGTH_SHORT).show();
-
         myRef.addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                //retrieve user information from the database
-             //   textCount = mFirebaseMethods.getImageCount(dataSnapshot);
                 Log.d(TAG, "onDataChange: text count: " + textCount);
-
-                //retrieve images for the user in question
 
             }
 

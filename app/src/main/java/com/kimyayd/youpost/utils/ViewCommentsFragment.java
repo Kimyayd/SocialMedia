@@ -26,8 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.kimyayd.youpost.R;
-import com.kimyayd.youpost.models.Photo;
-
 import com.kimyayd.youpost.models.Comment;
 import com.kimyayd.youpost.models.RealVideo;
 import com.kimyayd.youpost.models.Video;
@@ -115,20 +113,21 @@ public class ViewCommentsFragment extends Fragment {
             }
         });
 
-        mBackArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "Back", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onClick: navigating back");
-                if(getCallingActivityFromBundle().equals(getString(R.string.video_activity))){
-                    getActivity().getSupportFragmentManager().popBackStack();
-//                    ((MainActivity)getActivity()).showLayout();
-                }else{
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
-
-            }
-        });
+//        mBackArrow.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(mContext, "Back", Toast.LENGTH_SHORT).show();
+//                Log.d(TAG, "onClick: navigating back");
+//                if(getCallingActivityFromBundle().equals(getString(R.string.main_activity))){
+//                    getActivity().getSupportFragmentManager().popBackStack();
+//                    (HomeFragment).showLayout();
+////                    ((MainActivity)getActivity()).showLayout();
+//                }else{
+//                    getActivity().getSupportFragmentManager().popBackStack();
+//                }
+//
+//            }
+//        });
     }
 
     private void closeKeyboard(){
@@ -150,22 +149,14 @@ public class ViewCommentsFragment extends Fragment {
         hashMap.put("post_id",video.getVideo_id());
         hashMap.put("comment_id", commentID);
         hashMap.put("date_created",getTimestamp());
-
-        //insert into photos node
-        myRef.child(getString(R.string.dbname_videos))
-                .child(getString(R.string.field_comments))
-                .child(video.getVideo_id())
-                .child(commentID)
-                .setValue(hashMap);
-
-        //insert into user_photos node
-        myRef.child(getString(R.string.dbname_user_photos))
+        myRef.child(getString(R.string.dbname_user_videos))
                 .child(video.getUser_id())
                 .child(getString(R.string.field_comments))
                 .child(video.getVideo_id())
                 .child(commentID)
                 .setValue(hashMap);
 
+        //insert into user_photos node
     }
 
     private String getTimestamp(){

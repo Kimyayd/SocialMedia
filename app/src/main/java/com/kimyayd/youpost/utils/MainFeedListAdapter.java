@@ -2,6 +2,8 @@ package com.kimyayd.youpost.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -14,10 +16,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -26,19 +30,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.kimyayd.youpost.MainActivity;
 import com.kimyayd.youpost.R;
-import com.kimyayd.youpost.models.Comment;
 import com.kimyayd.youpost.models.Heart;
 import com.kimyayd.youpost.models.Like;
 import com.kimyayd.youpost.models.Post;
 import com.kimyayd.youpost.models.User;
 import com.kimyayd.youpost.models.UserAccountSettings;
-import com.kimyayd.youpost.profile.ProfileActivity;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.sprylab.android.widget.TextureVideoView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -79,11 +83,10 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
         String likesString;
         TextView username, timeDetla, caption, likes, comments;
         SquareImageView image;
-        TextView text;
         ImageView heartRed, heartWhite, comment,share;
         ImageButton play;
 
-        TextureVideoView videoView;
+        VideoView videoView;
         UserAccountSettings settings = new UserAccountSettings();
         User user  = new User();
         StringBuilder users;
@@ -91,6 +94,34 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
         Heart heart;
         GestureDetector detector;
         Post post;
+    }
+    private void shareImageAndText(String title,Bitmap bit) {
+        Uri uri = saveImage(bit);
+        Intent shIntent = new Intent(Intent.ACTION_SEND);
+        shIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shIntent.putExtra(Intent.EXTRA_TEXT, title);
+        shIntent.putExtra(Intent.EXTRA_SUBJECT, "Share Here");
+        shIntent.setType("image/*");
+        mContext.startActivity(Intent.createChooser(shIntent, "Share Via"));
+    }
+
+    private Uri saveImage(Bitmap image) {
+        File imagesFolder = new File(mContext.getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imagesFolder.mkdirs();
+            File file = new File(imagesFolder, "shared_image.png");
+
+            FileOutputStream stream = new FileOutputStream(file);
+            image.compress(Bitmap.CompressFormat.PNG, 90, stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(mContext, "com.kimyayd.youpost.fileprovider", file);
+
+        } catch (IOException e) {
+            Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return uri;
     }
 
     @NonNull
@@ -104,7 +135,6 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
             holder = new ViewHolder();
             ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
             holder.username = (TextView) convertView.findViewById(R.id.username);
-            holder.text = (TextView) convertView.findViewById(R.id.post_text);
             holder.image = (SquareImageView) convertView.findViewById(R.id.post_image);
             holder.heartRed = (ImageView) convertView.findViewById(R.id.image_heart_red);
             holder.heartWhite = (ImageView) convertView.findViewById(R.id.image_heart);
@@ -116,7 +146,7 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
             holder.timeDetla = (TextView) convertView.findViewById(R.id.image_time_posted);
             holder.mprofileImage = (CircleImageView) convertView.findViewById(R.id.profile_photo);
             holder.play = (ImageButton) convertView.findViewById(R.id.play);
-            holder.videoView = (TextureVideoView) convertView.findViewById(R.id.post_video);
+            holder.videoView = (VideoView) convertView.findViewById(R.id.post_video);
 
 
 
@@ -134,129 +164,58 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
 
         getCurrentUsername();
         getLikesString(holder);
-        holder.share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (holder.post.getPost_type().equals("1")) {
-                    Uri imageUri = Uri.parse(holder.post.getPost_path());
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, holder.post.getCaption());
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-                    shareIntent.setType("image/*");
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                    try {
-                        mContext.startActivity(shareIntent);
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }else if(holder.post.getPost_type().equals("0")) {
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, holder.post.getCaption());
-                    shareIntent.setType("text/plain");
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                    try {
-                        mContext.startActivity(shareIntent);
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-                else if(holder.post.getPost_type().equals("2")) {
-                    Intent shareIntent = new Intent();
-                    Uri videoUri = Uri.parse(holder.post.getPost_path());
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, holder.post.getCaption());
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, videoUri);
-                    shareIntent.setType("video/*");
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                    try {
-                        mContext.startActivity(shareIntent);
-                    } catch (android.content.ActivityNotFoundException ex) {
-                        Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            }
-        });
-//        List<Comment> comments = getItem(position).getComments();
-        //" + comments.size() + "
-        holder.comments.setText("View all comments");
-        holder.comments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: loading comment thread for " + getItem(position).getPost_id());
-                ((MainActivity)mContext).onCommentThreadSelected(getItem(position),
-                        mContext.getString(R.string.home_activity));
-            }
-        });
-
 
         String timestampDifference = getTimestampDifference(getItem(position));
-        if(!timestampDifference.equals("0")){
-            holder.timeDetla.setText(timestampDifference + " DAYS AGO");
-        }else{
+        if(!timestampDifference.equals("0")) {
+            if (timestampDifference.equals("1")) {
+                holder.timeDetla.setText("YESTERDAY");
+            } else{
+                holder.timeDetla.setText(timestampDifference + " DAYS AGO");
+            }
+        }
+        else{
             holder.timeDetla.setText("TODAY");
         }
-        Log.d(TAG, "getView: "+getItem(position).getPost_type());
+        holder.caption.setText(getItem(position).getCaption());
 
-        if(holder.post.getPost_type().equals("1")) {
-            Log.d(TAG,"Image is on: 1");
-            holder.text.setVisibility(View.GONE);
-            holder.caption.setText(getItem(position).getCaption());
-            final ImageLoader imageLoader = ImageLoader.getInstance();
-            imageLoader.displayImage(getItem(position).getPost_path(), holder.image);
-        }
-        else if(holder.post.getPost_type().equals("0")){
-            Log.d(TAG,"Text is on: 0");
-            holder.image.setVisibility(View.GONE);
-            holder.caption.setVisibility(View.GONE);
-            holder.text.setText(getItem(position).getCaption());
+        switch (holder.post.getPost_type()) {
+            case "1":
+                Log.d(TAG, "Image is on: 1");
+                holder.share.setImageResource(R.drawable.ic_baseline_share_24);
+                holder.videoView.setVisibility(View.GONE);
+                holder.caption.setText(getItem(position).getCaption());
+                final ImageLoader imageLoader = ImageLoader.getInstance();
+                imageLoader.displayImage(getItem(position).getPost_path(), holder.image);
+                break;
+            case "0":
+                Log.d(TAG, "Text is on: 0");
+                holder.image.setVisibility(View.GONE);
+                holder.videoView.setVisibility(View.GONE);
+                holder.share.setImageResource(R.drawable.ic_baseline_share_24);
+                holder.caption.setText(getItem(position).getCaption());
 
-        }else if(holder.post.getPost_type().equals("2")){
-            holder.text.setVisibility(View.GONE);
-            holder.image.setVisibility(View.GONE);
-            holder.caption.setText(getItem(position).getCaption());
-            holder.play.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-            holder.videoView.setVideoPath(getItem(position).getPost_path());
-            holder.videoView.start();
-            holder.play.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(holder.videoView.isPlaying()){
-                        holder.play.setVisibility(View.VISIBLE);
-                        holder.videoView.pause();
-                    }else{
-                        holder.videoView.start();
-                        holder.play.setVisibility(View.GONE);
+                break;
+            case "2":
+                holder.image.setVisibility(View.GONE);
+                holder.caption.setText(getItem(position).getCaption());
+                holder.videoView.setVideoPath(getItem(position).getPost_path());
+                holder.videoView.start();
+                holder.videoView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (holder.videoView.isPlaying()) {
+                            holder.videoView.pause();
+                            Toast.makeText(mContext, "Video paused!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            holder.videoView.start();
+                            Toast.makeText(mContext, "Video played!", Toast.LENGTH_SHORT).show();
+
+                        }
                     }
-                }
-            });
-            holder.videoView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(holder.videoView.isPlaying()){
-                        holder.play.setVisibility(View.VISIBLE);
-                        holder.videoView.pause();
-                    }else{
-                        holder.videoView.start();
-                        holder.play.setVisibility(View.GONE);
-                    }
-                }
-            });
+                });
+                break;
         }
-        //set the image
-//        if(!getItem(position).getPost_type().equals(R.string.text)) {
-//            final ImageLoader imageLoader = ImageLoader.getInstance();
-//            imageLoader.displayImage(getItem(position).getPost_path(), holder.image);
-//        }
 
-        //get the profile image and username
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         Query query = reference
                 .child(mContext.getString(R.string.dbname_user_account_settings))
@@ -278,45 +237,16 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
                             holder.mprofileImage);
                     Log.d(TAG, "onDataChange: found photo: "+singleSnapshot.getValue(UserAccountSettings.class).getProfile_photo());
 
-                    holder.username.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Log.d(TAG, "onClick: navigating to profile of: " +
-                                    holder.user.getUsername());
-                           Intent intent = new Intent(mContext, ProfileActivity.class);
-                           intent.putExtra(mContext.getString(R.string.calling_activity),
-                           mContext.getString(R.string.home_activity));
-                           intent.putExtra(mContext.getString(R.string.intent_user), holder.user);
-                           mContext.startActivity(intent);
-                        }
-                    });
-
-                    holder.mprofileImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Log.d(TAG, "onClick: navigating to profile of: " +
-                                    holder.user.getUsername());
-                        }
-
-//                            Intent intent = new Intent(mContext, ProfileActivity.class);
-//                            intent.putExtra(mContext.getString(R.string.calling_activity),
-//                                    mContext.getString(R.string.home_activity));
-//                            intent.putExtra(mContext.getString(R.string.intent_user), holder.user);
-//                            mContext.startActivity(intent);
-                        }
-                    );
-
-
 
                     holder.settings = singleSnapshot.getValue(UserAccountSettings.class);
                     holder.comment.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((MainActivity)mContext).onCommentThreadSelected(getItem(position),
-                                    mContext.getString(R.string.home_activity));
-
-                            //another thing?
-//                            ((MainActivity)mContext).hideLayout();
+                            Intent intent=new Intent(mContext, Comment__activity.class);
+                            intent.putExtra("id",holder.post.getPost_id());
+                            intent.putExtra("user_id",holder.post.getUser_id());
+                            intent.putExtra("type",holder.post.getPost_type());
+                            mContext.startActivity(intent);
                         }
                     });
                 }
@@ -326,6 +256,102 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+        final int[] l = {0};
+
+        if( holder.post.getPost_type().equals("2")) {
+            DatabaseReference refs = FirebaseDatabase.getInstance().getReference("user_videos").child(holder.post.getUser_id()).child("comments").child(holder.post.getPost_id());
+            refs.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
+                        Log.d(TAG, "It'sss not" + dataSnapshot1);
+                        if (dataSnapshot1.exists()) {
+                            l[0]++;
+                        }
+                    }
+                    if(l[0]==0) {
+                        holder.comments.setText("Add a comment");
+                    }else if(l[0]==1){
+                        holder.comments.setText("View comment");
+                    }else{
+                        holder.comments.setText("View all " + l[0] + " comments");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }else {
+            DatabaseReference refs = FirebaseDatabase.getInstance().getReference("user_posts").child(holder.post.getUser_id()).child("comments").child(holder.post.getPost_id());
+            refs.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
+                        Log.d(TAG, "It'sss not" + dataSnapshot1);
+                        if (dataSnapshot1.exists()) {
+                            l[0]++;
+                        }
+                    }
+                    if(l[0]==0) {
+                        holder.comments.setText("Add a comment");
+                    }else if(l[0]==1){
+                        holder.comments.setText("View comment");
+                    }else{
+                        holder.comments.setText("View all " + l[0] + " comments");
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+        }
+        holder.comments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(mContext, Comment__activity.class);
+                intent.putExtra("id",holder.post.getPost_id());
+                intent.putExtra("user_id",holder.post.getUser_id());
+                intent.putExtra("type",holder.post.getPost_type());
+                mContext.startActivity(intent);
+            }
+        });
+
+
+        holder.share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.post.getPost_type().equals("1")) {
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) holder.image.getDrawable();
+                    if(bitmapDrawable==null) {
+                        Toast.makeText(mContext, "Please wait for the image to be load", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Log.d(TAG, "It's" + holder.image.getDrawable().toString());
+                        Bitmap bitmap = bitmapDrawable.getBitmap();
+                        shareImageAndText(holder.post.getCaption(), bitmap);
+                    }
+
+                }else {
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, holder.post.getCaption());
+                    shareIntent.setType("text/plain");
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    try {
+                        mContext.startActivity(shareIntent);
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
             }
         });
 
@@ -391,68 +417,28 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
         }
 
         @Override
-        public boolean onDoubleTap(MotionEvent e) {
+        public boolean onSingleTapUp(MotionEvent e) {
             Log.d(TAG, "onDoubleTap: double tap detected.");
 
             Log.d(TAG, "onDoubleTap: clicked on post: " + mHolder.post.getPost_id());
 
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-            Query query = reference
-                    .child(mContext.getString(R.string.dbname_user_posts))
-                    .child(mHolder.post.getUser_id())
-                    .child("likes")
-                    .child(mHolder.post.getPost_id());
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+            if (mHolder.post.getPost_type().equals("2")) {
 
-                        String keyID = singleSnapshot.getKey();
+                DatabaseReference references = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_user_videos));
+                Query quer = references
+                        .child(mHolder.post.getUser_id())
+                        .child("likes")
+                        .child(mHolder.post.getPost_id());
+                quer.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
 
-                        //case1: Then user already liked the photo
-                        if (mHolder.likeByCurrentUser
-//                                && singleSnapshot.getValue(Like.class).getUser_id()
-//                                        .equals(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        ) {
+                            String keyID = singleSnapshot.getKey();
 
-                            if (mHolder.post.getPost_type().equals("0")) {
-
-                                mReference.child(mContext.getString(R.string.dbname_user_texts))
-                                        .child(mHolder.post.getUser_id())
-                                        .child("likes")
-                                        .child(mHolder.post.getPost_id())
-                                        .child(keyID)
-                                        .removeValue();
-
-
-                                mReference.child(mContext.getString(R.string.dbname_user_posts))
-                                        .child(mHolder.post.getUser_id())
-                                        .child("likes")
-//                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                        .child(mHolder.post.getPost_id())
-                                        .child(keyID)
-                                        .removeValue();
-
-
-                            } else if (mHolder.post.getPost_type().equals("1")) {
-
-                                mReference.child(mContext.getString(R.string.dbname_user_photos))
-                                        .child(mHolder.post.getUser_id())
-                                        .child("likes")
-                                        .child(mHolder.post.getPost_id())
-                                        .child(keyID)
-                                        .removeValue();
-
-
-                                mReference.child(mContext.getString(R.string.dbname_user_posts))
-                                        .child(mHolder.post.getUser_id())
-                                        .child("likes")
-//                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                        .child(mHolder.post.getPost_id())
-                                        .child(keyID)
-                                        .removeValue();
-
-                            } else if (mHolder.post.getPost_type().equals("2")) {
+                            //case1: Then user already liked the photo
+                            if (mHolder.likeByCurrentUser
+                            ) {
 
                                 mReference.child(mContext.getString(R.string.dbname_user_videos))
                                         .child(mHolder.post.getUser_id())
@@ -461,42 +447,131 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
                                         .child(keyID)
                                         .removeValue();
 
+                                mHolder.heart.toggleLike();
+                                getLikesString(mHolder);
                             }
+                            //case2: The user has not liked the photo
+                            else if (!mHolder.likeByCurrentUser) {
+                                //add new like
+                                addNewLike(mHolder);
+                                break;
+                            }
+                        }
+                        if (!dataSnapshot.exists()) {
+                            addNewLike(mHolder);
+                        }
+
+                    }
+
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+            else {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_user_posts));
+                Query query = reference
+                        .child(mHolder.post.getUser_id())
+                        .child("likes")
+                        .child(mHolder.post.getPost_id());
+
+
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(TAG,"LIKES ARE "+dataSnapshot);
+                        for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+                            String keyID = singleSnapshot.getKey();
+
+                            //case1: Then user already liked the photo
+                            if (mHolder.likeByCurrentUser
+                            ) {
+
+                                if (mHolder.post.getPost_type().equals("0")) {
+
+                                    mReference.child(mContext.getString(R.string.dbname_user_texts))
+                                            .child(mHolder.post.getUser_id())
+                                            .child("likes")
+                                            .child(mHolder.post.getPost_id())
+                                            .child(keyID)
+                                            .removeValue();
+
+
+                                    mReference.child(mContext.getString(R.string.dbname_user_posts))
+                                            .child(mHolder.post.getUser_id())
+                                            .child("likes")
+//                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .child(mHolder.post.getPost_id())
+                                            .child(keyID)
+                                            .removeValue();
+
+
+                                } else if (mHolder.post.getPost_type().equals("1")) {
+
+                                    mReference.child(mContext.getString(R.string.dbname_user_photos))
+                                            .child(mHolder.post.getUser_id())
+                                            .child("likes")
+                                            .child(mHolder.post.getPost_id())
+                                            .child(keyID)
+                                            .removeValue();
+
+
+                                    mReference.child(mContext.getString(R.string.dbname_user_posts))
+                                            .child(mHolder.post.getUser_id())
+                                            .child("likes")
+//                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .child(mHolder.post.getPost_id())
+                                            .child(keyID)
+                                            .removeValue();
+
+                                }
 
 ///
-                            mHolder.heart.toggleLike();
-                            getLikesString(mHolder);
+                                mHolder.heart.toggleLike();
+                                getLikesString(mHolder);
+                            }
+                            //case2: The user has not liked the photo
+                            else if (!mHolder.likeByCurrentUser) {
+                                //add new like
+                                addNewLike(mHolder);
+                                break;
+                            }
                         }
-                        //case2: The user has not liked the photo
-                        else if (!mHolder.likeByCurrentUser) {
-                            //add new like
+                        if (!dataSnapshot.exists()) {
                             addNewLike(mHolder);
-                            break;
                         }
-                    }
-                    if (!dataSnapshot.exists()) {
-                        addNewLike(mHolder);
+
                     }
 
-                }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            }
+            return true;
+        }
 
-                }
-            });
-
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
             return true;
         }
     }
 
     private void addNewLike(final ViewHolder holder){
         Log.d(TAG, "addNewLike: adding new like");
-
+        String user_id=FirebaseAuth.getInstance().getCurrentUser().getUid();
         String newLikeID = mReference.push().getKey();
+
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        hashMap.put("user_id",user_id);
+
         if(holder.post.getPost_type().equals("0")){
 
             mReference.child(mContext.getString(R.string.dbname_user_texts))
@@ -505,8 +580,15 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
                     .child(holder.post.getPost_id())
                     .child(newLikeID)
                     .setValue(hashMap);
+            mReference.child(mContext.getString(R.string.dbname_user_posts))
+                    .child(holder.post.getUser_id())
+                    .child(mContext.getString(R.string.field_likes))
+                    .child(holder.post.getPost_id())
+                    .child(newLikeID)
+                    .setValue(hashMap);
 
-        }else if(holder.post.getPost_type().equals("1")){
+        }
+        else if(holder.post.getPost_type().equals("1")){
 
             mReference.child(mContext.getString(R.string.dbname_user_photos))
                     .child(holder.post.getUser_id())
@@ -514,8 +596,15 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
                     .child(holder.post.getPost_id())
                     .child(newLikeID)
                     .setValue(hashMap);
+            mReference.child(mContext.getString(R.string.dbname_user_posts))
+                    .child(holder.post.getUser_id())
+                    .child(mContext.getString(R.string.field_likes))
+                    .child(holder.post.getPost_id())
+                    .child(newLikeID)
+                    .setValue(hashMap);
 
-        }else if(holder.post.getPost_type().equals("2")){
+        }
+        else if(holder.post.getPost_type().equals("2")){
 
             mReference.child(mContext.getString(R.string.dbname_user_videos))
                     .child(holder.post.getUser_id())
@@ -525,12 +614,7 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
                     .setValue(hashMap);
 
         }
-        mReference.child(mContext.getString(R.string.dbname_user_posts))
-                .child(holder.post.getUser_id())
-                .child(mContext.getString(R.string.field_likes))
-                .child(holder.post.getPost_id())
-                .child(newLikeID)
-                .setValue(hashMap);
+
 
         holder.heart.toggleLike();
         getLikesString(holder);
@@ -559,104 +643,187 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
         });
     }
 
-    private void getLikesString(final ViewHolder holder){
+    private void getLikesString(final ViewHolder holder) {
         Log.d(TAG, "getLikesString: getting likes string");
 
         Log.d(TAG, "getLikesString: post id: " + holder.post.getPost_id());
-        try{
+        try {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-            Query query = reference
-                    .child(mContext.getString(R.string.dbname_posts))
-                    .child(holder.post.getPost_id())
-                    .child(mContext.getString(R.string.field_likes));
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    holder.users = new StringBuilder();
-                    for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
+            if (!holder.post.getPost_type().equals("2")) {
+                Query query = reference
+                        .child(mContext.getString(R.string.dbname_user_posts))
+                        .child(holder.post.getUser_id())
+                        .child(mContext.getString(R.string.field_likes))
+                        .child(holder.post.getPost_id());
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        holder.users = new StringBuilder();
+                        for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                        Query query = reference
-                                .child(mContext.getString(R.string.dbname_users))
-                                .orderByChild(mContext.getString(R.string.field_user_id))
-                                .equalTo(singleSnapshot.getValue(Like.class).getUser_id());
-                        query.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
-                                    Log.d(TAG, "onDataChange: found like: " +
-                                            singleSnapshot.getValue(User.class).getUsername());
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+                            Query query = reference
+                                    .child(mContext.getString(R.string.dbname_users))
+                                    .orderByChild(mContext.getString(R.string.field_user_id))
+                                    .equalTo(singleSnapshot.getValue(Like.class).getUser_id());
+                            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+                                        Log.d(TAG, "onDataChange: found like: " +
+                                                singleSnapshot.getValue(User.class).getUsername());
 
-                                    holder.users.append(singleSnapshot.getValue(User.class).getUsername());
-                                    holder.users.append(",");
+                                        holder.users.append(singleSnapshot.getValue(User.class).getUsername());
+                                        holder.users.append(",");
+                                    }
+
+                                    String[] splitUsers = holder.users.toString().split(",");
+
+                                    if (holder.users.toString().contains(currentUsername + ",")) {//mitch, mitchell.tabian
+                                        holder.likeByCurrentUser = true;
+                                    } else {
+                                        holder.likeByCurrentUser = false;
+                                    }
+
+                                    int length = splitUsers.length;
+                                    if (length == 1) {
+                                        holder.likesString = "Liked by " + splitUsers[0];
+                                    } else if (length == 2) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + " and " + splitUsers[1];
+                                    } else if (length == 3) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + ", " + splitUsers[1]
+                                                + " and " + splitUsers[2];
+
+                                    } else if (length == 4) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + ", " + splitUsers[1]
+                                                + ", " + splitUsers[2]
+                                                + " and " + splitUsers[3];
+                                    } else if (length > 4) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + ", " + splitUsers[1]
+                                                + ", " + splitUsers[2]
+                                                + " and " + (splitUsers.length - 3) + " others";
+                                    }
+                                    Log.d(TAG, "onDataChange: likes string: " + holder.likesString);
+                                    //setup likes string
+                                    setupLikesString(holder, holder.likesString);
                                 }
 
-                                String[] splitUsers = holder.users.toString().split(",");
-
-                                if(holder.users.toString().contains(currentUsername + ",")){//mitch, mitchell.tabian
-                                    holder.likeByCurrentUser = true;
-                                }else{
-                                    holder.likeByCurrentUser = false;
-                                }
-
-                                int length = splitUsers.length;
-                                if(length == 1){
-                                    holder.likesString = "Liked by " + splitUsers[0];
-                                }
-                                else if(length == 2){
-                                    holder.likesString = "Liked by " + splitUsers[0]
-                                            + " and " + splitUsers[1];
-                                }
-                                else if(length == 3){
-                                    holder.likesString = "Liked by " + splitUsers[0]
-                                            + ", " + splitUsers[1]
-                                            + " and " + splitUsers[2];
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
                                 }
-                                else if(length == 4){
-                                    holder.likesString = "Liked by " + splitUsers[0]
-                                            + ", " + splitUsers[1]
-                                            + ", " + splitUsers[2]
-                                            + " and " + splitUsers[3];
-                                }
-                                else if(length > 4){
-                                    holder.likesString = "Liked by " + splitUsers[0]
-                                            + ", " + splitUsers[1]
-                                            + ", " + splitUsers[2]
-                                            + " and " + (splitUsers.length - 3) + " others";
-                                }
-                                Log.d(TAG, "onDataChange: likes string: " + holder.likesString);
-                                //setup likes string
-                                setupLikesString(holder, holder.likesString);
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+                            });
+                        }
+                        if (!dataSnapshot.exists()) {
+                            holder.likesString = "";
+                            holder.likeByCurrentUser = false;
+                            //setup likes string
+                            setupLikesString(holder, holder.likesString);
+                        }
                     }
-                    if(!dataSnapshot.exists()){
-                        holder.likesString = "";
-                        holder.likeByCurrentUser = false;
-                        //setup likes string
-                        setupLikesString(holder, holder.likesString);
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
-                }
+                });
+            }
+            else{
+                Query query = reference
+                        .child(mContext.getString(R.string.dbname_user_videos))
+                        .child(holder.post.getUser_id())
+                        .child(mContext.getString(R.string.field_likes))
+                        .child(holder.post.getPost_id());
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        holder.users = new StringBuilder();
+                        for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+                            Query query = reference
+                                    .child(mContext.getString(R.string.dbname_users))
+                                    .orderByChild(mContext.getString(R.string.field_user_id))
+                                    .equalTo(singleSnapshot.getValue(Like.class).getUser_id());
+                            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+                                        Log.d(TAG, "onDataChange: found like: " +
+                                                singleSnapshot.getValue(User.class).getUsername());
 
-                }
-            });
-        }catch (NullPointerException e){
-            Log.e(TAG, "getLikesString: NullPointerException: " + e.getMessage() );
+                                        holder.users.append(singleSnapshot.getValue(User.class).getUsername());
+                                        holder.users.append(",");
+                                    }
+
+                                    String[] splitUsers = holder.users.toString().split(",");
+
+                                    if (holder.users.toString().contains(currentUsername + ",")) {//mitch, mitchell.tabian
+                                        holder.likeByCurrentUser = true;
+                                    } else {
+                                        holder.likeByCurrentUser = false;
+                                    }
+
+                                    int length = splitUsers.length;
+                                    if (length == 1) {
+                                        holder.likesString = "Liked by " + splitUsers[0];
+                                    } else if (length == 2) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + " and " + splitUsers[1];
+                                    } else if (length == 3) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + ", " + splitUsers[1]
+                                                + " and " + splitUsers[2];
+
+                                    } else if (length == 4) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + ", " + splitUsers[1]
+                                                + ", " + splitUsers[2]
+                                                + " and " + splitUsers[3];
+                                    } else if (length > 4) {
+                                        holder.likesString = "Liked by " + splitUsers[0]
+                                                + ", " + splitUsers[1]
+                                                + ", " + splitUsers[2]
+                                                + " and " + (splitUsers.length - 3) + " others";
+                                    }
+                                    Log.d(TAG, "onDataChange: likes string: " + holder.likesString);
+                                    //setup likes string
+                                    setupLikesString(holder, holder.likesString);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                        if (!dataSnapshot.exists()) {
+                            holder.likesString = "";
+                            holder.likeByCurrentUser = false;
+                            //setup likes string
+                            setupLikesString(holder, holder.likesString);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        }catch (NullPointerException e) {
+            Log.e(TAG, "getLikesString: NullPointerException: " + e.getMessage());
             holder.likesString = "";
             holder.likeByCurrentUser = false;
             //setup likes string
             setupLikesString(holder, holder.likesString);
         }
     }
+
 
     private void setupLikesString(final ViewHolder holder, String likesString){
         Log.d(TAG, "setupLikesString: likes string:" + holder.likesString);
@@ -686,10 +853,6 @@ public class MainFeedListAdapter extends ArrayAdapter<Post> {
         holder.likes.setText(likesString);
     }
 
-    /**
-     * Returns a string representing the number of days ago the post was made
-     * @return
-     */
     private String getTimestampDifference(Post post){
         Log.d(TAG, "getTimestampDifference: getting timestamp difference.");
 

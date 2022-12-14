@@ -40,18 +40,13 @@ public class VideoFragment extends Fragment {
     private List<Post> posts;
     private static final String TAG = "VideoActivity";
     private int resultsCount = 0;
-    private RelativeLayout relativeLayout;
-    ListView recyclerView;
-    MainFeedListAdapter postsAdapter;
+    private ListView recyclerView;
+    private MainFeedListAdapter postsAdapter;
     private User mUser;
-    public VideoFragment() {
-        // Required empty public constructor
-    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -141,50 +136,4 @@ public class VideoFragment extends Fragment {
 
     }
 
-
-    private void getFriendsAccountSettings(){
-        Log.d(TAG, "getFriendsAccountSettings: getting friends account settings.");
-
-        for(int i = 0; i < mFollowing.size(); i++) {
-            Log.d(TAG, "getFriendsAccountSettings: user: " + mFollowing.get(i));
-            final int count = i;
-            Query query = FirebaseDatabase.getInstance().getReference()
-                    .child(getString(R.string.dbname_user_account_settings))
-                    .orderByKey()
-                    .equalTo(mFollowing.get(i));
-
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Log.d(TAG, "getFriendsAccountSettings: got a user: " + snapshot.getValue(UserAccountSettings.class).getDisplay_name());
-                        mUserAccountSettings.add(snapshot.getValue(UserAccountSettings.class));
-
-                        if(count == 0){
-                            JSONObject userObject = new JSONObject();
-                            try {
-                                userObject.put(getString(R.string.field_display_name), mUserAccountSettings.get(count).getDisplay_name());
-                                userObject.put(getString(R.string.field_username), mUserAccountSettings.get(count).getUsername());
-                                userObject.put(getString(R.string.field_profile_photo), mUserAccountSettings.get(count).getProfile_photo());
-                                userObject.put(getString(R.string.field_user_id), mUserAccountSettings.get(count).getUser_id());
-                                JSONObject userSettingsStoryObject = new JSONObject();
-                                userSettingsStoryObject.put(getString(R.string.user_account_settings), userObject);
-                            } catch ( JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
 }

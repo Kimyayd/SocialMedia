@@ -134,7 +134,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 default:
                     last_msg.setText(theLastMessage);
                     String timestampDifference = getTimestampDifference(theLastMessageDate);
-                    Toast.makeText(mContext, "It's "+timestampDifference, Toast.LENGTH_SHORT).show();
                     if(!timestampDifference.equals("0")){
                         if(timestampDifference.equals("1")) {
                             last_msg_date.setText("YESTERDAY");

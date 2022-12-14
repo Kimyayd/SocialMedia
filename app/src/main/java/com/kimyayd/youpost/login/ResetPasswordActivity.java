@@ -29,10 +29,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
 
-        TextView emailPassword = (TextView) findViewById(R.id.emailPassword);
+        TextView emailPassword =  findViewById(R.id.emailPassword);
         setupFirebaseAuth();
 
-        Button sendVerificationEmail = (Button) findViewById(R.id.sendVerificationEmail);
+        Button sendVerificationEmail =  findViewById(R.id.sendVerificationEmail);
         sendVerificationEmail.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -87,13 +87,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
             FirebaseUser user = firebaseAuth.getCurrentUser();
 
             if (user != null) {
-                // User is signed in
                 Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
             } else {
-                // User is signed out
                 Log.d(TAG, "onAuthStateChanged:signed_out");
             }
-            // ...
         };
     }
 

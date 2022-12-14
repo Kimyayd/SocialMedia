@@ -2,7 +2,6 @@ package com.kimyayd.youpost.add;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -29,25 +27,19 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
-import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 
 public class GalleryFragment extends Fragment {
     private static final String TAG = "GalleryFragment";
 
-
-    //constants
     private static final int NUM_GRID_COLUMNS = 3;
 
 
-    //widgets
     private GridView gridView;
     private ImageView galleryImage;
     private ProgressBar mProgressBar;
     private Spinner directorySpinner;
 
-    //vars
     private ArrayList<String> directories;
     private String mAppend = "file:/";
     private String mSelectedImage;
@@ -59,22 +51,22 @@ public class GalleryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getActivity()));
 
-        galleryImage = (ImageView) view.findViewById(R.id.galleryImageView);
-        gridView = (GridView) view.findViewById(R.id.gridView);
-        directorySpinner = (Spinner) view.findViewById(R.id.spinnerDirectory);
-        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        galleryImage = view.findViewById(R.id.galleryImageView);
+        gridView =  view.findViewById(R.id.gridView);
+        directorySpinner = view.findViewById(R.id.spinnerDirectory);
+        mProgressBar =  view.findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.GONE);
         directories = new ArrayList<>();
         Log.d(TAG, "onCreateView: started.");
 
-        ImageView shareClose = (ImageView) view.findViewById(R.id.ivCloseShare);
+        ImageView shareClose =  view.findViewById(R.id.ivCloseShare);
         shareClose.setOnClickListener(v -> {
             Log.d(TAG, "onClick: closing the gallery fragment.");
             getActivity().finish();
         });
 
 
-        TextView nextScreen = (TextView) view.findViewById(R.id.tvNext);
+        TextView nextScreen = view.findViewById(R.id.tvNext);
         nextScreen.setOnClickListener(v -> {
             Log.d(TAG, "onClick: navigating to the final share screen.");
             if(isRootTask()){
@@ -108,7 +100,6 @@ public class GalleryFragment extends Fragment {
     private void init() {
         FilePaths filePaths = new FilePaths();
 
-        //check for other folders indide "/storage/emulated/0/pictures"
         if (FileSearch.getDirectoryPaths(filePaths.PICTURES) != null) {
             directories = FileSearch.getDirectoryPaths(filePaths.PICTURES);
         }
@@ -123,7 +114,6 @@ public class GalleryFragment extends Fragment {
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                //directoryNames=directories;
                 android.R.layout.simple_spinner_item, directoryNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         directorySpinner.setAdapter(adapter);
@@ -132,8 +122,6 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "onItemClick: selected: " + directories.get(position));
-
-                //setup our image grid for the directory chosen
                 setupGridView(directories.get(position));
             }
 
@@ -154,18 +142,13 @@ public class GalleryFragment extends Fragment {
         if(imgURLs.size()!=0) {
             ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getActivity()));
 
-
-            //set the grid column width
             int gridWidth = getResources().getDisplayMetrics().widthPixels;
             int imageWidth = gridWidth / NUM_GRID_COLUMNS;
             gridView.setColumnWidth(imageWidth);
 
-            //use the grid adapter to adapter the images to gridview
-
             GridImageAdapter adapter = new GridImageAdapter(getActivity(), R.layout.layout_grid_imageview, mAppend, imgURLs);
             gridView.setAdapter(adapter);
 
-            //set the first image to be displayed when the activity fragment view is inflated
             try {
                 if (imgURLs.size() != 0) {
                     ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getActivity()));
@@ -192,13 +175,6 @@ public class GalleryFragment extends Fragment {
 
     private void setImage(String imgURL, ImageView image, String append) {
         Log.d(TAG, "setImage: setting image");
-
-//        Picasso.get().
-//                load(append + imgURL).
-//                placeholder(R.drawable.black_mamba).
-//                into(image);
-        Log.d(TAG, "setImage: setting image");
-
         ImageLoader imageLoader = ImageLoader.getInstance();
 
         imageLoader.displayImage(append + imgURL, image, new ImageLoadingListener() {

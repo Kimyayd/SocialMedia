@@ -11,27 +11,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.kimyayd.youpost.MainActivity;
 import com.kimyayd.youpost.R;
-import com.kimyayd.youpost.home.HomeFragment;
-import com.kimyayd.youpost.models.Text;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
-    private static final Boolean CHECK_IF_VERIFIED = false;
-
     private Context mContext;
     private ProgressBar mProgressBar;
     private EditText mEmail, mPassword;
@@ -45,10 +35,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_login);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mPleaseWait = (TextView) findViewById(R.id.pleaseWait);
-        mEmail = (EditText) findViewById(R.id.input_email);
-        mPassword = (EditText) findViewById(R.id.input_password);
+        mProgressBar =  findViewById(R.id.progressBar);
+        mPleaseWait =  findViewById(R.id.pleaseWait);
+        mEmail =  findViewById(R.id.input_email);
+        mPassword =  findViewById(R.id.input_password);
         mContext = LoginActivity.this;
         Log.d(TAG, "onCreate: started.");
 
@@ -71,8 +61,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void init() {
 
-        //initialize the button for logging in
-        Button btnLogin = (Button) findViewById(R.id.btn_login);
+        Button btnLogin = findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,9 +81,6 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                                 FirebaseUser user = mAuth.getCurrentUser();
 
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
                                 if (!task.isSuccessful()) {
                                     Log.w(TAG, "signInWithEmail:failed", task.getException());
 
@@ -104,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                                     mPleaseWait.setVisibility(View.GONE);
                                 } else {
                                     try {
-//                                            if(CHECK_IF_VERIFIED){
+
                                         if (user.isEmailVerified()) {
                                             Log.d(TAG, "onComplete: success. email is verified.");
                                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -115,26 +101,19 @@ public class LoginActivity extends AppCompatActivity {
                                             mPleaseWait.setVisibility(View.GONE);
                                             mAuth.signOut();
                                         }
-//                                            }
-//                                            else{
-//                                                Log.d(TAG, "onComplete: success. email is verified.");
-//                                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-//                                                startActivity(intent);
-//                                            }
 
                                     } catch (NullPointerException e) {
                                         Log.e(TAG, "onComplete: NullPointerException: " + e.getMessage());
                                     }
                                 }
 
-                                // ...
                             });
                 }
 
             }
         });
 
-        TextView forgotPassword=(TextView) findViewById(R.id.forgotPassword);
+        TextView forgotPassword= findViewById(R.id.forgotPassword);
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,16 +121,13 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button buttonSignIn = (Button) findViewById(R.id.buttonSignIn);
+        Button buttonSignIn = findViewById(R.id.buttonSignIn);
         buttonSignIn.setOnClickListener(v -> {
             Log.d(TAG, "onClick: navigating to register screen");
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
 
-         /*
-         If the user is logged in then navigate to HomeActivity and call 'finish()'
-          */
         if (mAuth.getCurrentUser() != null) {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
@@ -168,13 +144,13 @@ public class LoginActivity extends AppCompatActivity {
             FirebaseUser user = firebaseAuth.getCurrentUser();
 
             if (user != null) {
-                // User is signed in
+
                 Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
             } else {
-                // User is signed out
+
                 Log.d(TAG, "onAuthStateChanged:signed_out");
             }
-            // ...
+
         };
     }
 

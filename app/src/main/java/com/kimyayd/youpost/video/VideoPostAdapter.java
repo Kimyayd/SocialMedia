@@ -36,6 +36,7 @@ import com.kimyayd.youpost.models.User;
 import com.kimyayd.youpost.models.UserAccountSettings;
 import com.kimyayd.youpost.models.Video;
 import com.kimyayd.youpost.profile.ViewProfilActivity;
+import com.kimyayd.youpost.utils.Comment_activity;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.sprylab.android.widget.TextureVideoView;
@@ -53,14 +54,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHolder>{
+
     private static final String TAG = "Adapter";
     Context mContext;
     List<Video> postList;
-    private LayoutInflater mInflater;
-    private int mLayoutResource;
     private DatabaseReference mReference;
     private String currentUsername = "";
-
+    private Boolean val=false;
     private Activity activity;
     public VideoPostAdapter(@NonNull Context context, @NonNull Activity activity, @NonNull List<Video> postList) {
         this.mContext = context;
@@ -72,14 +72,12 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
     @NonNull
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //inflate layout post_row.xml
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_container_video, parent, false);
         return new MyHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
-//
         setVideoData(postList.get(position),holder);
     }
 
@@ -92,14 +90,12 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
     static class MyHolder extends RecyclerView.ViewHolder{
         TextureVideoView videoView;
         TextView textVideoTitle, textVideoDate,textVideoUsername;
-        TextView like_number,comment_number,share_number;
-        ImageView image_plus,comment_image,share_image;
+        TextView like_number,comment_number;
+        ImageView image_plus,comment_image;
         CircleImageView mprofileImage;
         ProgressBar videoProgressBar;
         ImageView heartRed, heartWhite;
         String likesString;
-
-        UserAccountSettings settings = new UserAccountSettings();
         User user  = new User();
         StringBuilder users;
         boolean likeByCurrentUser;
@@ -115,23 +111,73 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
             textVideoUsername=itemView.findViewById(R.id.textVideoUsername);
             like_number=itemView.findViewById(R.id.like_number);
             comment_number=itemView.findViewById(R.id.comment_number);
-            share_number=itemView.findViewById(R.id.share_number);
             image_plus=itemView.findViewById(R.id.image_plus);
             videoProgressBar=itemView.findViewById(R.id.videoProgressBar);
             mprofileImage=itemView.findViewById(R.id.profile_image);
-            comment_image = (ImageView) itemView.findViewById(R.id.comment_image);
-            share_image = (ImageView) itemView.findViewById(R.id.share_image);
-            heartRed = (ImageView) itemView.findViewById(R.id.image_heart_red);
-            heartWhite = (ImageView) itemView.findViewById(R.id.image_heart);
+            comment_image =itemView.findViewById(R.id.comment_image);
+            heartRed = itemView.findViewById(R.id.image_heart_red);
+            heartWhite = itemView.findViewById(R.id.image_heart);
         }
 
 
     }
 
     void setVideoData(Video videoItem, MyHolder holder){
-
         holder.video=videoItem;
+        if (videoItem.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+            holder.image_plus.setVisibility(View.GONE);
+        } else {
+
+            Query query = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_following)).child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for(DataSnapshot snapshot:dataSnapshot.getChildren()) {
+                        Log.d(TAG,"User is :"+snapshot.toString());
+                        UserAccountSettings user=snapshot.getValue(UserAccountSettings.class);
+                        if(user.getUser_id().equals(videoItem.getUser_id())) {
+                            val = true;
+                        break;
+                        }
+                    }
+                    if(val) {
+                        holder.image_plus.setVisibility(View.GONE);
+                    }else{
+                        holder.image_plus.setVisibility(View.VISIBLE);
+                        holder.image_plus.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child(mContext.getString(R.string.dbname_following))
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .child(videoItem.getUser_id())
+                                        .child(mContext.getString(R.string.field_user_id))
+                                        .setValue(videoItem.getUser_id());
+
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child(mContext.getString(R.string.dbname_followers))
+                                        .child(videoItem.getUser_id())
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .child(mContext.getString(R.string.field_user_id))
+                                        .setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                holder.image_plus.setVisibility(View.GONE);
+
+                            }
+                        });
+                    }
+
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+
+        }
+
         holder.detector = new GestureDetector(mContext, new GestureListener(holder));
+        holder.users = new StringBuilder();
         holder.heart = new Heart(holder.heartWhite, holder.heartRed);
 //            setupLikesString(holder);
         getCurrentUsername();
@@ -149,28 +195,42 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
                 for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
                     Log.d(TAG,"IT's Okay..." +singleSnapshot.getValue(UserAccountSettings.class).getUsername());
 
-
+                    String timestampDifference = getTimestampDifference(videoItem);
+                    if(!timestampDifference.equals("0")) {
+                        if (timestampDifference.equals("1")) {
+                            holder.textVideoDate.setText("YESTERDAY");
+                        } else{
+                            holder.textVideoDate.setText(timestampDifference + " DAYS AGO");
+                        }
+                    }
+                    else{
+                        holder.textVideoDate.setText("TODAY");
+                    }
                     holder.textVideoUsername.setText("@"+singleSnapshot.getValue(UserAccountSettings.class).getUsername());
                     holder.textVideoTitle.setText(videoItem.getCaption());
                     ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(holder.mprofileImage.getContext()));
                     ImageLoader imageLoader = ImageLoader.getInstance();
-                    imageLoader.displayImage(singleSnapshot.getValue(UserAccountSettings.class).getProfile_photo(),
-                            holder.mprofileImage);
+                    if(!(singleSnapshot.getValue(UserAccountSettings.class).getProfile_photo().equals("default"))){
 
+                        imageLoader.displayImage(singleSnapshot.getValue(UserAccountSettings.class).getProfile_photo(),
+                                holder.mprofileImage);
+                    }else{
+                        holder.mprofileImage.setImageResource(R.drawable.person);
+                    }
 
 
                     final int[] l = {0};
+
                     DatabaseReference refs=FirebaseDatabase.getInstance().getReference("user_videos").child(videoItem.getUser_id()).child("comments").child(videoItem.getVideo_id());
                     refs.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for(DataSnapshot dataSnapshot1 :snapshot.getChildren()){
-                                Log.d(TAG,"Commentss "+snapshot);
                                 if(dataSnapshot1.exists()){
                                     l[0]++;
-
                                 }
                             }
+                            holder.comment_number.setText(""+l[0]);
                         }
 
                         @Override
@@ -178,15 +238,24 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
 
                         }
                     });
-                    holder.comment_number.setText(""+l[0]);
+
                     holder.textVideoUsername.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
                             Intent intent = new Intent(mContext, ViewProfilActivity.class);
-                            intent.putExtra(mContext.getString(R.string.calling_activity),
-                                    mContext.getString(R.string.home_activity));
                             intent.putExtra(mContext.getString(R.string.intent_user), holder.user);
+                            mContext.startActivity(intent);
+                        }
+                    });
+                    holder.comment_image.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent=new Intent(mContext, Comment_activity.class);
+                            intent.putExtra("id",holder.video.getVideo_id());
+                            intent.putExtra("user_id",holder.video.getUser_id());
+                            intent.putExtra(mContext.getString(R.string.calling_activity),
+                                    mContext.getString(R.string.video_activity));
                             mContext.startActivity(intent);
                         }
                     });
@@ -204,16 +273,6 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
 
                                                             }
                     );
-                    holder.share_image.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            shareVideo(holder.video.getVideo_path(),holder.video.getCaption());
-
-                        }
-                    });
-
-
-
                 }
 
 
@@ -253,16 +312,16 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
                 holder.videoProgressBar.setVisibility(View.GONE);
                 mediaPlayer.start();
 
-//                    float videoRatio = mediaPlayer.getVideoWidth() /(float) mediaPlayer.getVideoHeight();
-//                    float screenRatio = videoView.getWidth() /(float) videoView.getHeight();
-//
-//                    float scale = videoRatio/screenRatio;
-//
-//                    if(scale >= 1f){
-//                        videoView.setScaleX(scale);
-//                    }else {
-//                        videoView.setScaleY(1f / scale);
-//                    }
+                    float videoRatio = mediaPlayer.getVideoWidth() /(float) mediaPlayer.getVideoHeight();
+                    float screenRatio = holder.videoView.getWidth() /(float) holder.videoView.getHeight();
+
+                    float scale = videoRatio/screenRatio;
+
+                    if(scale >= 1f){
+                        holder.videoView.setScaleX(scale);
+                    }else {
+                       holder.videoView.setScaleY(1f / scale);
+                    }
             }
 
 
@@ -290,26 +349,27 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
         });
 
     }
-    private void shareVideo(String title,String path){
-        Uri uri=saveVideo(path);
-        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-        sharingIntent.setType("video/mp4");
-        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Hey this is the video subject");
-        sharingIntent.putExtra(Intent.EXTRA_TEXT, title);
-        sharingIntent.putExtra(Intent.EXTRA_STREAM,uri);
-        mContext.startActivity(Intent.createChooser(sharingIntent,"Share Video"));
-    }
-    private Uri saveVideo(String path){
-        ContentValues content = new ContentValues(4);
-        content.put(MediaStore.Video.VideoColumns.DATE_ADDED,
-                System.currentTimeMillis() / 1000);
-        content.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
-        content.put(MediaStore.Video.Media.DATA, path);
+//    private void shareVideo(String title,String path){
+//        Uri uri=saveVideo(path);
+//        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+//        sharingIntent.setType("video/mp4");
+//        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Hey this is the video subject");
+//        sharingIntent.putExtra(Intent.EXTRA_TEXT, title);
+//        sharingIntent.putExtra(Intent.EXTRA_STREAM,uri);
+//        mContext.startActivity(Intent.createChooser(sharingIntent,"Share Video"));
+//    }
+//    private Uri saveVideo(String path){
+//        ContentValues content = new ContentValues(4);
+//        content.put(MediaStore.Video.VideoColumns.DATE_ADDED,
+//                System.currentTimeMillis() / 1000);
+//        content.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+//        content.put(MediaStore.Video.Media.DATA, path);
+//
+//        ContentResolver resolver = mContext.getContentResolver();
+//        Uri uri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, content);
+//        return uri;
+//    }
 
-        ContentResolver resolver = mContext.getContentResolver();
-        Uri uri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, content);
-        return uri;
-    }
     public class GestureListener extends GestureDetector.SimpleOnGestureListener{
 
         MyHolder mHolder;
@@ -323,15 +383,14 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
         }
 
         @Override
-        public boolean onDoubleTap(MotionEvent e) {
+        public boolean onSingleTapUp(MotionEvent e) {
             Context mContext=mHolder.videoView.getContext();
             Log.d(TAG, "onDoubleTap: double tap detected.");
 
             Log.d(TAG, "onDoubleTap: clicked on post: " + mHolder.video.getVideo_id());
 
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_user_videos));
             Query query = reference
-                    .child(mContext.getString(R.string.dbname_user_videos))
                     .child(mHolder.video.getUser_id())
                     .child("likes")
                     .child(mHolder.video.getVideo_id());
@@ -371,7 +430,11 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
 
                 }
             });
+            return true;
+        }
 
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
             return true;
         }
 
@@ -380,15 +443,12 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
 
     private void addNewLike(final MyHolder holder){
         Log.d(TAG, "addNewLike: adding new like");
-        DatabaseReference mReference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference mReference = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_user_videos));
         String newLikeID = mReference.push().getKey();
-//        Like like = new Like();
-//        like.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        mReference.child(mContext.getString(R.string.dbname_user_videos))
-                .child(holder.video.getUser_id())
+        mReference.child(holder.video.getUser_id())
                 .child("likes")
                 .child(holder.video.getVideo_id())
                 .child(newLikeID)
@@ -397,21 +457,9 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
         holder.heart.toggleLike();
         getLikesString(holder);
     }
-    private void setTag(String filePath){
-//        File videoFile = new File(filePath);
-//        Uri videoURI = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-//                ? FileProvider.getUriForFile(mContext, mContext.getPackageName(), videoFile)
-//                : Uri.fromFile(videoFile);
-//        ShareCompat.IntentBuilder.from(mContext)
-//                .setStream(videoURI)
-//                .setType("video/mp4")
-//                .setChooserTitle("Share video...")
-//                .startChooser();
-    }
 
     private void setupLikesString(final MyHolder holder, String likesString){
         Log.d(TAG, "setupLikesString: likes string:" + holder.likesString);
-
         Log.d(TAG, "setupLikesString: post id: " + holder.video.getVideo_id());
         if(holder.likeByCurrentUser){
             Log.d(TAG, "setupLikesString: post is liked by current user");
@@ -443,23 +491,22 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
 
         Log.d(TAG, "getLikesString: post id: " + holder.video.getVideo_id());
         try{
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_user_videos));
             Log.d(TAG,"Database connection");
             Query query = reference
-                    .child(mContext.getString(R.string.dbname_videos))
+                    .child(holder.video.getUser_id())
                     .child("likes")
                     .child(holder.video.getVideo_id());
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    holder.likesString="0";
                     Log.d(TAG,"Not Database connection problem");
+                    //                    holder.likesString="0";
                     holder.users = new StringBuilder();
                     for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_users));
                         Query query = reference
-                                .child(mContext.getString(R.string.dbname_users))
                                 .orderByChild(mContext.getString(R.string.field_user_id))
                                 .equalTo(singleSnapshot.getValue(Like.class).getUser_id());
                         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -475,7 +522,7 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
 
                                 String[] splitUsers = holder.users.toString().split(",");
 
-                                if(holder.users.toString().contains(currentUsername + ",")){//mitch, mitchell.tabian
+                                if(holder.users.toString().contains(currentUsername + ",")){
                                     holder.likeByCurrentUser = true;
                                 }else{
                                     holder.likeByCurrentUser = false;
@@ -544,11 +591,11 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
             setupLikesString(holder, holder.likesString);
         }
     }
-    private  void getCurrentUsername(){
+
+    private void getCurrentUsername(){
         Log.d(TAG, "getCurrentUsername: retrieving user account settings");
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mContext.getString(R.string.dbname_users));
         Query query = reference
-                .child(mContext.getString(R.string.dbname_users))
                 .orderByChild(mContext.getString(R.string.field_user_id))
                 .equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -566,6 +613,7 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.MyHo
             }
         });
     }
+
     private String getTimestampDifference(Video post){
         Log.d(TAG, "getTimestampDifference: getting timestamp difference.");
 

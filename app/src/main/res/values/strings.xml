@@ -117,6 +117,7 @@
     <string name="profile_activity">Profile Activity</string>
     <string name="search_activity">Search Activity</string>
     <string name="home_activity">Home Activity</string>
+    <string name="main_activity">Main Activity</string>
     <string name="video_activity">Video Activity</string>
     <string name="exemple_activity">Exemple Activity</string>
     <string name="messages">Messages</string>

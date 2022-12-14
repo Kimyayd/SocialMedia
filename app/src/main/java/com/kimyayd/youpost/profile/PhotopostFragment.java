@@ -37,7 +37,6 @@ public class PhotopostFragment extends Fragment {
     private List<Post> posts;
     private static final String TAG = "VideoActivity";
     private int resultsCount = 0;
-    private RelativeLayout relativeLayout;
     ListView mListView;
     MainFeedListAdapter postsAdapter;
     private User mUser;
@@ -109,17 +108,6 @@ public class PhotopostFragment extends Fragment {
                         post.setDate_created(objectMap.get(getString(R.string.field_date_created)).toString());
                         post.setPost_type("1");
                         post.setPost_path(objectMap.get(getString(R.string.field_post_path)).toString());
-//                        List<Comment> commentsList = new ArrayList<Comment>();
-//                        for (DataSnapshot dSnapshot : ds
-//                                .child(getString(R.string.field_comments)).getChildren()) {
-//                            Map<String, Object> object_map = (HashMap<String, Object>) dSnapshot.getValue();
-//                            Comment comment = new Comment();
-//                            comment.setUser_id(object_map.get(getString(R.string.field_user_id)).toString());
-//                            comment.setComment(object_map.get(getString(R.string.field_comment)).toString());
-//                            comment.setDate_created(object_map.get(getString(R.string.field_date_created)).toString());
-//                            commentsList.add(comment);
-//                        }
-//                        post.setComments(commentsList);
                         posts.add(post);
                     }
 
@@ -130,11 +118,9 @@ public class PhotopostFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    //in case of error
                     Toast.makeText(getContext(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-
 
     }
 

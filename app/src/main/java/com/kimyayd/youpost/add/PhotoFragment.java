@@ -20,7 +20,6 @@ public class PhotoFragment extends Fragment {
 
     //constant
     private static final int PHOTO_FRAGMENT_NUM = 1;
-    private static final int GALLERY_FRAGMENT_NUM = 2;
     private static final int  CAMERA_REQUEST_CODE = 5;
 
 
@@ -30,7 +29,7 @@ public class PhotoFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_photo, container, false);
         Log.d(TAG, "onCreateView: started.");
 
-        Button btnLaunchCamera = (Button) view.findViewById(R.id.btnLaunchCamera);
+        Button btnLaunchCamera = view.findViewById(R.id.btnLaunchCamera);
         btnLaunchCamera.setOnClickListener(v -> {
             Log.d(TAG, "onClick: launching camera.");
 

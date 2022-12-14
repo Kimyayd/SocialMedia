@@ -33,11 +33,9 @@ public class TextFragment extends Fragment {
     private ArrayList<String> mFollowing;
     private ArrayList<UserAccountSettings> mUserAccountSettings;
     private List<Post> posts;
-    private static final String TAG = "VideoActivity";
     private int resultsCount = 0;
-    private RelativeLayout relativeLayout;
-    ListView recyclerView;
-    MainFeedListAdapter postsAdapter;
+    private ListView recyclerView;
+    private MainFeedListAdapter postsAdapter;
     private User mUser;
 
     public TextFragment() {
@@ -53,14 +51,11 @@ public class TextFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_text, container, false);
 
         recyclerView =view.findViewById(R.id.textRecycler);
         recyclerView.setHorizontalFadingEdgeEnabled(true);
         mUser=((ViewProfilActivity)getContext()).getUserFromBundle();
-
-
 
         loadTexts();
         return view;
@@ -108,17 +103,6 @@ public class TextFragment extends Fragment {
                         post.setUser_id(objectMap.get(getString(R.string.field_user_id)).toString());
                         post.setDate_created(objectMap.get(getString(R.string.field_date_created)).toString());
                         post.setPost_type("0");
-//                        List<Comment> commentsList = new ArrayList<Comment>();
-//                        for (DataSnapshot dSnapshot : ds
-//                                .child(getString(R.string.field_comments)).getChildren()) {
-//                            Map<String, Object> object_map = (HashMap<String, Object>) dSnapshot.getValue();
-//                            Comment comment = new Comment();
-//                            comment.setUser_id(object_map.get(getString(R.string.field_user_id)).toString());
-//                            comment.setComment(object_map.get(getString(R.string.field_comment)).toString());
-//                            comment.setDate_created(object_map.get(getString(R.string.field_date_created)).toString());
-//                            commentsList.add(comment);
-//                        }
-//                        post.setComments(commentsList);
                         posts.add(post);
                     }
 

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -47,12 +48,11 @@ public class HomeFragment extends Fragment {
     private ArrayList<String> mFollowing;
     private int recursionIterator = 0;
     private int resultsCount = 0;
+    private LinearLayout mLinearLayout;
+
     private ArrayList<UserAccountSettings> mUserAccountSettings;
-    ListView mListView;
-    MainListAdapter postsAdapter;
-    public HomeFragment() {
-        // Required empty public constructor
-    }
+    private ListView mListView;
+    private MainListAdapter postsAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +67,7 @@ public class HomeFragment extends Fragment {
         });
 
         firebaseAuth = FirebaseAuth.getInstance();
+        mLinearLayout=view.findViewById(R.id.linearlayout);
         mListView = view.findViewById(R.id.postlists);
         mListView.setHorizontalFadingEdgeEnabled(true);
 
@@ -75,10 +76,7 @@ public class HomeFragment extends Fragment {
         getFollowing();
         return view;
     }
-    private void initListViewRefresh(){
-        mListView.setHorizontalFadingEdgeEnabled(true);
-        mListView.setAdapter(postsAdapter);
-    }
+
     private void getFriendsAccountSettings(){
         Log.d(TAG, "getFriendsAccountSettings: getting friends account settings.");
 
@@ -117,6 +115,7 @@ public class HomeFragment extends Fragment {
                     }
                 }
 
+
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
 
@@ -125,12 +124,11 @@ public class HomeFragment extends Fragment {
         }
     }
 
-
     private void getFollowing() {
         Log.d(TAG, "getFollowing: searching for following");
 
         clearAll();
-        //also add your own id to the list
+
         mFollowing.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         Query query = FirebaseDatabase.getInstance().getReference()
@@ -187,7 +185,6 @@ public class HomeFragment extends Fragment {
 
 
     private void loadPosts() {
-        //path of all posts
 
         for (int i = 0; i < mFollowing.size(); i++) {
             final int count = i;
@@ -251,32 +248,26 @@ public class HomeFragment extends Fragment {
         }
     }
     private void displayPosts(){
-//        mPaginatedPhotos = new ArrayList<>();
-
         if(mPosts != null){
-
             try{
-
-                //sort for newest to oldest
                 Collections.sort(mPosts, new Comparator<Post>() {
                     public int compare(Post o1, Post o2) {
                         return o2.getDate_created().compareTo(o1.getDate_created());
                     }
                 });
 
-                //we want to load 10 at a time. So if there is more than 10, just load 10 to start
                 int iterations = mPosts.size();
                 if(iterations > 10){
                     iterations = 10;
                 }
-//
+
                 resultsCount = 0;
                 for(int i = 0; i < iterations; i++){
                     mPaginatedPosts.add(mPosts.get(i));
                     resultsCount++;
                     Log.d(TAG, "displayPhotos: adding a photo to paginated list: " + mPosts.get(i).getPost_id());
                 }
-                postsAdapter = new MainListAdapter(getActivity(), R.layout.layout_main_listitem,mPosts);
+                postsAdapter = new MainListAdapter(getActivity(), R.layout.layout_real,mPosts);
 
                 //set adapter to recyclerview
                 mListView.setAdapter(postsAdapter);
@@ -288,45 +279,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    //    private void searchPosts(String searchQuery){
-//        //path of all posts
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("posts");
-//        //get all data from this ref
-//        ref.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                postList.clear();
-//                for (DataSnapshot ds : snapshot.getChildren()){
-//                    Post modelPost = ds.getValue(Post.class);
-//                    if (modelPost.getpTitle().toLowerCase().contains(searchQuery.toLowerCase()) ||
-//                            modelPost.getpDescription().toLowerCase().contains(searchQuery.toLowerCase())){
-//                        postList.add(modelPost);
-//                    }
-//                    //adapter
-//                    postsAdapter = new PostsAdapter(getActivity(), postList);
-//                    //set adapter to recyclerview
-//                    recyclerView.setAdapter(postsAdapter);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                //in case of error
-//                showToast("" + error.getMessage());
-//            }
-//        });
-//    }
-//private void checkUserStatus(){
-//    //get current user
-//    FirebaseUser user = firebaseAuth.getCurrentUser();
-//    if (user != null){
-//        //user is signed in stay here // set email of logged user
-//    } else {
-//        //user is not signed go to signUp activity
-//        startActivity(new Intent(getActivity(), LoginActivity.class));
-//        getActivity().finish();
-//    }
-//}
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
