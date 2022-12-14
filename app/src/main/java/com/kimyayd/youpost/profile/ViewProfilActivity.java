@@ -50,10 +50,7 @@ public class ViewProfilActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference myRef;
-    private FirebaseMethods mFirebaseMethods;
-
-
-
+    
     //widgets
     private TextView mPosts, mFollowers, mFollowing, mDisplayName, mUsername, mWebsite, mDescription,
             mFollow, mUnfollow ;
@@ -79,7 +76,7 @@ public class ViewProfilActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_profil);
         mDisplayName =  findViewById(R.id.display_name);
         mUsername =  findViewById(R.id.username);
-        message =  findViewById(R.id.user_message);
+      
         mWebsite =  findViewById(R.id.website);
         mDescription =  findViewById(R.id.description);
         mProfilePhoto =  findViewById(R.id.profile_photo);
@@ -117,15 +114,7 @@ public class ViewProfilActivity extends AppCompatActivity {
             Log.e(TAG, "onCreateView: NullPointerException: " + e.getMessage());
             getSupportFragmentManager().popBackStack();
         }
-
-   message.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        Intent intent=new Intent(mContext, MessageActivity.class);
-        intent.putExtra("userid",mUser.getUser_id());
-        mContext.startActivity(intent);
-    }
-    });
+ 
         setupFirebaseAuth();
 
         isFollowing();
@@ -134,6 +123,16 @@ public class ViewProfilActivity extends AppCompatActivity {
         getPostsCount();
 
         if (!mUser.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+             message =  findViewById(R.id.user_message);
+             message.setImageResource(R.drawable.ic_messenger);
+             message.setOnClickListener(new View.OnClickListener() {
+           @Override
+         public void onClick(View view) {
+        Intent intent=new Intent(mContext, MessageActivity.class);
+        intent.putExtra("userid",mUser.getUser_id());
+        mContext.startActivity(intent);
+    }
+    });
             mFollow.setOnClickListener(v -> {
                 Log.d(TAG, "onClick: now following: " + mUser.getUsername());
 
