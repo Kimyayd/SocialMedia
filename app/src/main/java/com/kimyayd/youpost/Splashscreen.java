@@ -27,7 +27,7 @@ public class Splashscreen extends AppCompatActivity {
                     finish();
                 }else{
 
-                    Toast.makeText(Splashscreen.this, "True", Toast.LENGTH_SHORT).show();
+                  
                     startActivity(new Intent( getApplicationContext(), LoginActivity.class));
                     finish();
                 }
